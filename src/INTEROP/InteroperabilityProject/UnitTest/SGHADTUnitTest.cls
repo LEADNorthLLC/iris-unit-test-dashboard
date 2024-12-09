@@ -12,7 +12,7 @@ Class INTEROP.InteroperabilityProject.UnitTest.SGHADTUnitTest Extends LN.UnitTes
 /// </pre>]]>
 /// To run a Unit Test from console.
 /// <example>
-/// d ##class(BCBSSC.EG.UnitTest.MUSCAdtUnitTest).Debug()
+/// d ##class(INTEROP.InteroperabilityProject.UnitTest.SGHADTUnitTest).Debug()
 /// </example>
 Parameter TestSuite = "SGH-HL7ADT";
 
@@ -94,7 +94,7 @@ Method TestMessageA03()
 	do ..SendMessageToRouter(message,"TestMessageA03", routingProcess, expectSuccess, expectReturn, expectReason)
 }
 */
-Method TestMessageA04()
+Method TestMessageA04Routing()
 {
 	Set ReturnA04 = ..#SecondaryRoutingProcessName_":BCBSSC.EG.ProfSvcs.Router.Base.ADT.TransformA01"
 	#dim message as EnsLib.HL7.Message

@@ -15,6 +15,10 @@ XData ProductionDefinition
   </Item>
   <Item Name="DataWarehouseHL7Outbound" Category="SGH ADT" ClassName="EnsLib.HL7.Operation.TCPOperation" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
   </Item>
+  <Item Name="GHAdtTcpInbound" Category="GH ADT" ClassName="EnsLib.HL7.Service.TCPService" PoolSize="1" Enabled="false" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="MessageSchemaCategory">2.5.1</Setting>
+    <Setting Target="Host" Name="TargetConfigNames">SGHAdtRouter</Setting>
+  </Item>
 </Production>
 }
 

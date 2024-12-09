@@ -12,7 +12,7 @@ XData RuleDefinition [ XMLNamespace = "http://www.intersystems.com/rule" ]
 <constraint name="source" value="SGHAdtTcpInbound"></constraint>
 <constraint name="docCategory" value="2.5.1"></constraint>
 <constraint name="docName" value="ADT_A01"></constraint>
-<when condition="true" comment="">
+<when condition="1" comment="">
 <send transform="" target="DataWarehouseHL7Outbound"></send>
 </when>
 </rule>
