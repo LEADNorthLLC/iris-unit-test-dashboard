@@ -8,6 +8,9 @@
       <Packaging>module</Packaging>
       <SourcesRoot>src</SourcesRoot>
       <Resource Name="UnitTest.PKG"/>
+      <Resource Name="LN.PKG"/>
+      <Resource Name="INTEROP.PKG"/>
+      <Resource Name="IRISAPPPKG.PKG"/>
     
       <CSPApplication 
       Url="/csp/unittest/service"
