@@ -33,6 +33,8 @@ Parameter SecondaryRoutingProcessName = "DataWarehouseHL7Outbound";
 
 Parameter AssigningAuthority = "SGH";
 
+Parameter NewLine = 10;
+
 Method TestMessageA01()
 {
 	Set ReturnA01 = ..#PrimaryRoutingProcessName_":TransformA01"

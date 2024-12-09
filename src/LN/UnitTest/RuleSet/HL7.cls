@@ -234,8 +234,5 @@ MSH|^~\&|FRM|FRM5T|SYSA|SYSA|202207121010||OUL^R22^OUL_R22|1234567|P|2.5|||||GBR
 ]]></test>
 }
 
-/// Revision number of this class
-Parameter SrcVer = 2;
-
 }
 
