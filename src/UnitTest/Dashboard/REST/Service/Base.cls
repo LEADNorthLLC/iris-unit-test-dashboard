@@ -1,4 +1,4 @@
-Class CCD.Visualizer.REST.Service.Base Extends %CSP.REST 
+Class UnitTest.Dashboard.REST.Service.Base Extends %CSP.REST 
 {
 
 Parameter CHARSET = "utf-8";
@@ -47,7 +47,7 @@ ClassMethod OnPreDispatch(pUrl As %String, pMethod As %String, ByRef pContinue A
   } CATCH ex {
     SET tSC = ex.AsStatus()
   }
-  QUIT ##class(%iKnow.REST.Base).%ErrorHandler(tSC, .pContinue)
+  QUIT ##class(%CSP.REST).%ErrorHandler(tSC, .pContinue)
 }
 
 ClassMethod %ProcessResult(pStatus As %Status = {$$$OK}, pResult As %DynamicObject = "") As %Status [ Internal ]

@@ -1,4 +1,4 @@
-Class CCD.Visualizer.Model.Record Extends (%Persistent, %XML.Adaptor, %JSON.Adaptor)
+Class UnitTest.Dashboard.Model.Record Extends (%Persistent, %XML.Adaptor, %JSON.Adaptor)
 {
 
 Property TransformName As %String(MAXLEN = 100) [ InitialExpression = "SDA3/CCDAv21-to-SDA.xsl" ];

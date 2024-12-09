@@ -11,7 +11,7 @@ services:
       - 62773:52773
       - 63773
     volumes:
-      - ./:/irisdev/app
+      - ./:/home/irisowner/dev
   react:
     build:
       context: ./frontend/CCD-TOOLS-Frontend

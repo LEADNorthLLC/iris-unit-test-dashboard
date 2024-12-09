@@ -1,9 +1,59 @@
-Class CCD.Visualizer.REST.Transform Extends %RegisteredObject
+Class UnitTest.Dashboard.REST.ProjectService Extends UnitTest.Dashboard.REST.Service.Base 
 {
 
 /** Change Log
-2024-09-20 - Chi Nguyen-Rettig : Created
+2024-12-10 - Chi Nguyen-Rettig : Created
 **/
+
+
+//CNR: Copied RuleProfilesList method from CCDA Validator
+
+/// <BR> Return a list of Rule Profiles that are active or all rule profiles
+ClassMethod GetProjectInfo() As %Status
+{
+	Set tSC = $$$OK
+	#; Quit tSC
+	Try {		
+		#;Dispatch request to production
+		#Dim tResponse as %Library.DynamicObject
+
+		//this method should return a response that is the DynamicObject	 	
+    	$$$ThrowOnError(##class(LN.UnitTest.ProjectUtil).BuildProject("Interop", "IRISAPP",.tResponse))
+		
+
+
+		If $$$ISERR(tResponse.Status) {
+			Set %response.Status = ..#HTTP500INTERNALSERVERERROR
+		}
+
+		#;Write output 
+		If $Get(%request.CgiEnvs("HTTP_ACCEPT"),"*/*") [ "application/xml" {
+			Set %response.ContentType="application/xml"
+			$$$ThrowOnError(tResponse.XMLExportToStream(.tStream))
+		} 
+		Else {
+			Set %response.ContentType="application/json"
+			Set tStream=##class(%Stream.GlobalCharacter).%New()		
+			$$$ThrowOnError(##class(%Library.DynamicObject).toJSON(tResponse, .tStream))
+		}
+		Set %response.Status = ..#HTTP200OK
+		Do tStream.OutputToDevice()
+		Set ^zLog="Method called:OutputToDevice"
+		Do %response.SetHeader("Access-Control-Allow-Origin","*")
+
+
+	} 
+	Catch Ex {
+		Set tSC = Ex.AsStatus()
+		//If $$$TESTMODE zw tSC
+		Set %response.Status = ..#HTTP500INTERNALSERVERERROR
+		Set tSC = $$$OK
+	}
+	Quit tSC
+}
+
+
+
 
 // AddTemplate method takes in a template and adds it to the identity template
 // pXSLTemplate: A string with the template contents enclosed in tags <xsl:template></xsl:template>

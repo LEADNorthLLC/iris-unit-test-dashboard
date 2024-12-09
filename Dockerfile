@@ -2,27 +2,39 @@ ARG IMAGE=intersystemsdc/irishealth-community
 
 FROM $IMAGE AS builder
 
-USER root
+WORKDIR /home/irisowner/dev
 
-WORKDIR /opt/irisapp
-RUN chown ${ISC_PACKAGE_MGRUSER}:${ISC_PACKAGE_IRISGROUP} /opt/irisapp
+ARG TESTS=0
+ARG MODULE="UnitTest"
+ARG NAMESPACE="IRISAPP"
 
-USER irisowner
 
-COPY Installer.cls .
 
-COPY src src
-# COPY misc/csp /usr/irissys/csp
-COPY irissession.sh /
-SHELL ["/irissession.sh"] 
+#RUN chown ${ISC_PACKAGE_MGRUSER}:${ISC_PACKAGE_IRISGROUP} /opt/irisapp
+
+#USER irisowner
+
+COPY App.Installer.cls .
+
+#COPY misc/csp /usr/irissys/csp
+
+
+
+COPY .iris_init /home/irisowner/.iris_init
+
+RUN --mount=type=bind,src=.,dst=. \
+    pip3 install -r requirements.txt && \
+    iris start IRIS && \
+	iris session IRIS < iris.script && \
+    ([ $TESTS -eq 0 ] || iris session iris -U $NAMESPACE "##class(%ZPM.PackageManager).Shell(\"test $MODULE -v -only\",1,1)") && \
+    iris stop IRIS quietly
 
 RUN \
-  do $SYSTEM.OBJ.Load("Installer.cls", "ck") \
   set sc = ##class(App.Installer).setup() \
   zn "%SYS" \
   write "Create web application ..." \
-  set webName = "/csp/visualizer/service" \
-  set webProperties("DispatchClass") = "CCD.Visualizer.REST.ServiceMap" \
+  set webName = "/csp/unittest/service" \
+  set webProperties("DispatchClass") = "UnitTest.Dashboard.REST.ServiceMap" \
   set webProperties("NameSpace") = "IRISAPP" \
   set webProperties("Enabled") = 1 \
   set webProperties("MatchRoles") = ":%All" \
@@ -42,10 +54,10 @@ CMD [ "-l", "/usr/irissys/mgr/messages.log" ]
 
 FROM $IMAGE AS final
 
-ADD --chown=${ISC_PACKAGE_MGRUSER}:${ISC_PACKAGE_IRISGROUP} https://github.com/grongierisc/iris-docker-multi-stage-script/releases/latest/download/copy-data.py /irisdev/app/copy-data.py
+ADD --chown=${ISC_PACKAGE_MGRUSER}:${ISC_PACKAGE_IRISGROUP} https://github.com/grongierisc/iris-docker-multi-stage-script/releases/latest/download/copy-data.py /home/irisowner/dev/copy-data.py
 
 RUN --mount=type=bind,source=/,target=/builder/root,from=builder \
     cp -f /builder/root/usr/irissys/iris.cpf /usr/irissys/iris.cpf && \
-    python3 /irisdev/app/copy-data.py -c /usr/irissys/iris.cpf -d /builder/root/ 
+    python3 /home/irisowner/dev/copy-data.py -c /usr/irissys/iris.cpf -d /builder/root/
 
 

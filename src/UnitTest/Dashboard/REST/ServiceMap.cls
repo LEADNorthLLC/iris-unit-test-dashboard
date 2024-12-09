@@ -1,5 +1,5 @@
 /// Directs requests to the appropriate class
-Class CCD.Visualizer.REST.ServiceMap Extends CCD.Visualizer.REST.Service.Base 
+Class UnitTest.Dashboard.REST.ServiceMap Extends UnitTest.Dashboard.REST.Service.Base 
 {
 
 /** Change Log
@@ -15,13 +15,19 @@ Parameter UseSession = 1;
 XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 {
 <Routes>
-    <Route Url="/xpath/" Method="POST" Call="GetXPathValue"/>
+    <Route Url="/:projectname" Method="GET" Call="GetProjectInfo"/>
 	<Route Url="/transform/" Method="POST" Call="TransformCCD"/>
 	<Route Url="/xslt/" Method="POST" Call="TestXSL"/>
   </Routes>
 }
 
+//Return project tree
+ClassMethod GetProjectInfo() {
 
+	Return ##class(UnitTest.Dashboard.REST.ProjectService).GetProjectInfo()
+
+
+}
 
 ClassMethod GetXPathValue() As %Status
 {
