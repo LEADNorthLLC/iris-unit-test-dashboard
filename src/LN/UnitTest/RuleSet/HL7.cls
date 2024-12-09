@@ -16,7 +16,7 @@ Include Ensemble
 /// Set ^UnitTestRoot="C:\temp\"
 /// </example>
 /// Create directory "C:\temp\RuleSetHL7\"
-Class LN.UnitTest.RuleSet.HL7 Extends  %UnitTest.TestCase
+Class LN.UnitTest.RuleSet.HL7 Extends %UnitTest.TestCase
 {
 
 /// Common Object used for repeated testSets
@@ -230,9 +230,9 @@ ClassMethod GetSourceMessage() As EnsLib.HL7.Message
 XData SourceMessage
 {
 <test><![CDATA[
-MSH|^~\&|FRM|FRM5T|SYSA|SYSA|202207121010||OUL^R22^OUL_R22|1234567|P|2.5|||||GBR||EN
-]]></test>
+	MSH|^~\&|FRM|FRM5T|SYSA|SYSA|202207121010||OUL^R22^OUL_R22|1234567|P|2.5|||||GBR||EN
+	]]>
+</test>
 }
 
 }
-

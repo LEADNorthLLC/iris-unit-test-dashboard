@@ -7,10 +7,11 @@
       <Description>Repository for Unit Test Dashboard - InterSystems Ideas Programming Contest</Description>
       <Packaging>module</Packaging>
       <SourcesRoot>src</SourcesRoot>
+       <Resource Name="IRISAPPPKG.PKG"/>
       <Resource Name="UnitTest.PKG"/>
       <Resource Name="LN.PKG"/>
       <Resource Name="INTEROP.PKG"/>
-      <Resource Name="IRISAPPPKG.PKG"/>
+     
     
       <CSPApplication 
       Url="/csp/unittest/service"
