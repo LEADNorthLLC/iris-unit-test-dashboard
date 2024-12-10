@@ -59,7 +59,7 @@ ClassMethod BuildProject(projectName As %String, namespace As %String = "", pack
 		
 		Set unitTestObj = ##class(LN.UnitTest.Model.UnitTestClass).%New()
         set unitTestObj.name = tCurrentClass
-        w "Opening class : "_tCurrentClass,!
+        //w "Opening class : "_tCurrentClass,!
         set unitTestObj.testCaseList = ..AddTestCasesToClass( tCurrentClass , tNamespace, unitTestObj)
     	//insert the unitTestObj into the namespace object
     	do namespaceObj.UnitTestClasses.Insert(unitTestObj)    
@@ -127,7 +127,7 @@ ClassMethod GetClassesInPackage(packagePath As %String, namespace As %String = "
 	    //loop through multi-dimensional array
 	    Set key=$ORDER(classes(""))
    		While (key'="") {
-     			w key,!
+     			//w key,!
      			Do classList.Insert(key)
      			// Get next subscript 
      			SET key = $ORDER(classes(key))
