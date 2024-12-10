@@ -46,8 +46,19 @@ The management portal is available at:
 ```bash
 Login: _system/SYS
 ```
-The API is available on localhost:62773/csp/visusalier/service
+The API is available on localhost:62773/csp/unittest/service
 
+## How to Access the IRIS Terminal from Docker Terminal
+
+Open Docker Terminal: 
+```bash
+docker exec -it iris-unit-test-dashboard-iris-1 bash
+```
+
+Then open IRIS terminal:
+```bash
+iris session IRIS
+```
 
 ## CCD DevTools UI:
 
@@ -55,19 +66,20 @@ The UI is served from a second container and is available after docker startup a
 
 [CCD DevTools URL](http://localhost:4000)
 
-![CCD DevTools UI](misc/images/CCD_devtools_TransformTester.png)
+
 
 ## REST APIs - TESTING
 
 **Sample Data**
 Sample C-CDAs from the [SyntheaMass](https://synthea.mitre.org/downloads) open-source data set have been included in the `testing/sample data` folder for unit testing. 
 
+<!--
 **Postman export*
 An export for a Postman Collection to test the available APIs is located in the **testing** folder of this project. 
 Import `Visualizer.postman_collection.json` in Postman to run tests. 
 
 Data set up in the Postman import is also from Synthea. 
-
+-->
 
 # XPath Evaluation Test #
 When evaluating CCDs and building transforms, developers need to test an XPATH to see if it's pointing to the expected location. This XPath evaluation uses the same mechanism as the utilities and transformations within IRIS to locate the XPath so a developer can test that the syntax of the XPath is correct. 

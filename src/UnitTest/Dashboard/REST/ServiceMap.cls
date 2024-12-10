@@ -1,11 +1,12 @@
 /// Directs requests to the appropriate class
-Class UnitTest.Dashboard.REST.ServiceMap Extends UnitTest.Dashboard.REST.Service.Base 
+Class UnitTest.Dashboard.REST.ServiceMap Extends UnitTest.Dashboard.REST.Service.Base
 {
 
 /** Change Log
 2024-01-20 - Chi Nguyen-Rettig: initial
 **/
 Parameter Version = "1.0.0";
+
 /// Enable Cross-origin resource sharing handling.
 Parameter HandleCorsRequest = 1;
 
@@ -15,18 +16,18 @@ Parameter UseSession = 1;
 XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 {
 <Routes>
-    <Route Url="/:projectname" Method="GET" Call="GetProjectInfo"/>
+    <Route Url="/" Method="GET" Call="GetProjectInfo"/>
 	<Route Url="/transform/" Method="POST" Call="TransformCCD"/>
 	<Route Url="/xslt/" Method="POST" Call="TestXSL"/>
   </Routes>
 }
 
-//Return project tree
-ClassMethod GetProjectInfo() {
+// Return project tree
+
+ClassMethod GetProjectInfo()
+{
 
 	Return ##class(UnitTest.Dashboard.REST.ProjectService).GetProjectInfo()
-
-
 }
 
 ClassMethod GetXPathValue() As %Status
@@ -258,10 +259,9 @@ ClassMethod TestXSL() As %Status
 	Quit tSC
 }
 
-
 /// Helper methods:
 /// /// pLocation can be set using XPATH
-ClassMethod GetLocationValue(pStream As %Stream.Object, pLocation As %String, ByRef pValue As %String) 
+ClassMethod GetLocationValue(pStream As %Stream.Object, pLocation As %String, ByRef pValue As %String)
 {
 	
     Set pValue = ""
@@ -339,6 +339,7 @@ ClassMethod GetLocationValuesMultiple(pStream As %Stream.Object, pLocation As %S
     // Rewind the stream
     Do pStream.Rewind()
 }
+
 ClassMethod FormatResultsToJSON(pResults As %ListOfDataTypes, Output pJsonString As %String)
 {
 
@@ -363,7 +364,6 @@ ClassMethod FormatResultsToJSON(pResults As %ListOfDataTypes, Output pJsonString
 
     // Convert the array to JSON string
 	set pJsonString = jsonArray.%ToJSON()
-  
-
 }
+
 }
