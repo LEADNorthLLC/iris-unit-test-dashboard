@@ -1,63 +1,53 @@
-Class UnitTest.Dashboard.REST.ProjectService Extends UnitTest.Dashboard.REST.Service.Base 
+Class UnitTest.Dashboard.REST.ProjectService Extends UnitTest.Dashboard.REST.Service.Base
 {
 
 /** Change Log
 2024-12-10 - Chi Nguyen-Rettig : Created
 **/
-
-
-//CNR: Copied RuleProfilesList method from CCDA Validator
-
-/// <BR> Return a list of Rule Profiles that are active or all rule profiles
 ClassMethod GetProjectInfo() As %Status
 {
 	Set tSC = $$$OK
 	#; Quit tSC
 	Try {		
 		#;Dispatch request to production
-		#Dim tResponse as %Library.DynamicObject
+		#Dim tResponse as %String
 
-		//this method should return a response that is the DynamicObject	 	
-    	$$$ThrowOnError(##class(LN.UnitTest.ProjectUtil).BuildProject("Interop", "IRISAPP",.tResponse))
+		//this method should return a response that is project Object	 	
+    	$$$ThrowOnError(##class(LN.UnitTest.ProjectUtil).BuildProject("InteroperabilityProject", "IRISAPP","INTEROP", .tProjectObj))
 		
+		//Once we have a Project Object, convert it to JSON
 
+		set tStatus = tProjectObj.%JSONExportToStream(.tResponse)
 
-		If $$$ISERR(tResponse.Status) {
-			Set %response.Status = ..#HTTP500INTERNALSERVERERROR
+		If $$$ISERR(tStatus) {
+			Set %response.Status = 500
 		}
 
 		#;Write output 
-		If $Get(%request.CgiEnvs("HTTP_ACCEPT"),"*/*") [ "application/xml" {
-			Set %response.ContentType="application/xml"
-			$$$ThrowOnError(tResponse.XMLExportToStream(.tStream))
-		} 
-		Else {
-			Set %response.ContentType="application/json"
-			Set tStream=##class(%Stream.GlobalCharacter).%New()		
-			$$$ThrowOnError(##class(%Library.DynamicObject).toJSON(tResponse, .tStream))
-		}
-		Set %response.Status = ..#HTTP200OK
-		Do tStream.OutputToDevice()
+		Set %response.ContentType="application/json"
+	
+		Set %response.Status = 200
+		Do tResponse.OutputToDevice()
 		Set ^zLog="Method called:OutputToDevice"
 		Do %response.SetHeader("Access-Control-Allow-Origin","*")
 
 
 	} 
 	Catch Ex {
-		Set tSC = Ex.AsStatus()
+		Set tStatus = Ex.AsStatus()
 		//If $$$TESTMODE zw tSC
-		Set %response.Status = ..#HTTP500INTERNALSERVERERROR
-		Set tSC = $$$OK
+		Set %response.Status = 500
+		Set tStatus = $$$OK
 	}
-	Quit tSC
+	Quit tStatus
 }
 
-
-
-
 // AddTemplate method takes in a template and adds it to the identity template
+
 // pXSLTemplate: A string with the template contents enclosed in tags <xsl:template></xsl:template>
+
 // pIdentityTemplate: A string with the name of an XDATA block that contains the base stylesheet to be added to
+
 ClassMethod AddTemplate(pXSLTemplate As %String, pIdentityTemplate As %String = "IdentityTemplateXSL") As %Stream.GlobalCharacter
 {
 	Set tStatus = ##class(Ens.Util.URLStream).GetURLStream("xdata://" _ $THIS _ ":"_pIdentityTemplate, .tIdentityXSL)
@@ -148,7 +138,5 @@ XData IdentityTemplateXSL
 	</xsl:template>
 </xsl:stylesheet>
 }
-
-
 
 }

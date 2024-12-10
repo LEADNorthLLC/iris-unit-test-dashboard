@@ -51,8 +51,6 @@ ClassMethod BuildProject(projectName As %String, namespace As %String = "", pack
 	Set tPackagePath = tPackagePath_"."_projectName_".UnitTest"
 	
 	Set classList = ..GetClassesInPackage(tPackagePath)
-	Set unitTestList = ##class(%ListOfDataTypes).%New()
-	
 	
 	//instantiate UnitTestClass
 	#dim unitTestObj As LN.UnitTest.Model.UnitTestClass
@@ -61,16 +59,11 @@ ClassMethod BuildProject(projectName As %String, namespace As %String = "", pack
 		
 		Set unitTestObj = ##class(LN.UnitTest.Model.UnitTestClass).%New()
         set unitTestObj.name = tCurrentClass
-        w "Opening class : "_tCurrentClass,!
-        set unitTestObj.testCaseList = ..GetTestMethodsInClass( tCurrentClass , tNamespace)
-    	do unitTestList.Insert(unitTestObj)
-    
+        //w "Opening class : "_tCurrentClass,!
+        set unitTestObj.testCaseList = ..AddTestCasesToClass( tCurrentClass , tNamespace, unitTestObj)
+    	//insert the unitTestObj into the namespace object
+    	do namespaceObj.UnitTestClasses.Insert(unitTestObj)    
     }
-	
-	Set namespaceObj.UnitTestClasses = unitTestList
-	
-	//w "UnitTestClasses:"
-	//w namespaceObj.UnitTestClasses,! 
 	
 	Set projectObj.Namespace = namespaceObj
 	
@@ -79,6 +72,41 @@ ClassMethod BuildProject(projectName As %String, namespace As %String = "", pack
 		w ex.Status	
 	}
 	Quit tStatus
+}
+
+ClassMethod AddTestCasesToClass(className As %String, namespace As %String = "", ByRef unitTest As LN.UnitTest.Model.UnitTestClass) As %Status
+{
+	Set tStatus = $$$OK
+    
+    // Prepare the UnitTestClass
+    Set unitTest.name = className
+
+	
+    // Switch to the specified namespace
+    //Set currentNamespace = $namespace
+    //If (namespace '= currentNamespace) {
+    //    zn namespace
+    //}
+    #dim testCase As LN.UnitTest.Model.TestCase
+	#dim classObj As %Dictionary.ClassDefintion
+    // Use %Dictionary to find classes
+    Try {
+		set classObj = ##class(%Dictionary.ClassDefinition).%OpenId(className)	    
+	    // Iterate through the methods
+        Set testCase = ##class(LN.UnitTest.Model.TestCase).%New()
+        For int=1:1:classObj.Methods.Count() {
+            Set method = classObj.Methods.GetAt(int)
+            if $EXTRACT(method.Name,1,4)="Test" {
+	            Set testCase.name = method.Name
+	            Do unitTest.testCaseList.Insert(testCase) //add test case to list
+            }
+        }
+    } Catch ex {
+        Write "Error: ", ex.DisplayString(), !
+    }
+
+    // Return status
+    Quit tStatus
 }
 
 ClassMethod GetClassesInPackage(packagePath As %String, namespace As %String = "") As %ListOfDataTypes
@@ -99,7 +127,7 @@ ClassMethod GetClassesInPackage(packagePath As %String, namespace As %String = "
 	    //loop through multi-dimensional array
 	    Set key=$ORDER(classes(""))
    		While (key'="") {
-     			w key,!
+     			//w key,!
      			Do classList.Insert(key)
      			// Get next subscript 
      			SET key = $ORDER(classes(key))
