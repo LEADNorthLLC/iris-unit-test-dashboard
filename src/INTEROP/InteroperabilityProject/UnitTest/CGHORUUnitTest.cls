@@ -1,4 +1,5 @@
-Include Ensemble
+Class INTEROP.InteroperabilityProject.UnitTest.CGHORUUnitTets Extends LN.UnitTest.RuleSet.HL7
+{
 
 /// <pre>
 /// Copyright (c) Alex Woodhead 2022
@@ -9,222 +10,49 @@ Include Ensemble
 /// Source: https://github.com/alexatwoodhead/UnitTest_RuleSet
 /// Version: 1.0
 /// </pre>]]>
-/// Production must already be running in order to run the routing Test
-/// For the default TestSuite name of "RuleSetHL7"
-/// With a test directory of "c:\temp" set the global
+/// To run a Unit Test from console.
 /// <example>
-/// Set ^UnitTestRoot="C:\temp\"
+/// d ##class(INTEROP.InteroperabilityProject.UnitTest.CGHORUUnitTest).Debug()
 /// </example>
-/// Create directory "C:\temp\RuleSetHL7\"
-Class LN.UnitTest.RuleSet.HL7 Extends %UnitTest.TestCase
-{
-
-/// Common Object used for repeated testSets
-/// 
-Property HL7Message As EnsLib.HL7.Message [ Final, Private ];
-
-Property SourceBusinessService As Ens.BusinessService [ Final, Private ];
-
-Property SessionTest As %String [ MultiDimensional ];
-
-Property SourceBusinessServiceEnabledAtStart [ Final, InitialExpression = 1, Private ];
-
-Parameter Namespace;
-
-Parameter TestDirectory = "/tmp/unittest";
-
-Parameter TestSuite = "RuleSetHL7";
+Parameter TestSuite = "CGH-HL7ORU";
 
 /// Override for different schema
-Parameter HL7Schema = "2.5.1:OUL_R22";
+Parameter HL7Schema = "2.5.1:ORU_R01";
 
 /// Override with name of existing service on production
-Parameter SourceBusinessServiceName = "SomeBusinesService";
+Parameter SourceBusinessServiceName = "CGHOruTcpInbound";
 
 /// Override with name of existing business process routing engine on production
-Parameter TargetConfigName = "SomeRoutingEngine";
+Parameter TargetConfigName = "CGHOruRouter";
 
-Parameter CompletionDelay = 10;
+/// Primary routing process name on production
+Parameter PrimaryRoutingProcessName = "CGHOruRouter";
+
+/// Secondary routing process name on production
+Parameter SecondaryRoutingProcessName = "DataWarehouseHL7Outbound";
+
+Parameter AssigningAuthority = "CGH";
 
 Parameter NewLine = 10;
 
-ClassMethod Debug(testMethod As %String = "")
+Method TestMessageA01()
 {
-	if $G(^UnitTestRoot,"")=""{
-		Set ^UnitTestRoot = ..#TestDirectory
+	Set ReturnA01 = ..#PrimaryRoutingProcessName_":TransformA01"
+	#dim message as EnsLib.HL7.Message
 
-	}
-	if '$Data(^UnitTestRoot) {
-		Write "^UnitTestRoot global not set up"
-		quit
-	}
-	set unitTestDir=$G(^UnitTestRoot)_$S($E($G(^UnitTestRoot),1)="/":"/",1:"\")_..#TestSuite
-	if '##class(%File).DirectoryExists(unitTestDir) {
-		Write "UnitTest directory does not exist locally "_unitTestDir
-		quit
-	}
-	do ##class(%UnitTest.Manager).DebugRunTestCase(..#TestSuite,..%ClassName(1),"/noload/norecursive",testMethod)
-}
-
-Method OnBeforeAllTests() As %Status
-{
-	// change Namespace
-	zn ..#Namespace
-
-	// Load common Vanilla TestResult to augment per UnitTest
-	set ..HL7Message=..GetSourceMessage()
+    // Load new HL7Message per UnitTest
+	set ..HL7Message=..GetMessage("SourceMessageA01")
 	quit:'$IsObject(..HL7Message) $$$ERROR(5001,"Failed to correlate Xdata for Source Message")
 	
-	// Get the current production in focus
-	set tSC=##class(Ens.Director).GetProductionStatus(.prodName,.pState)
-	quit:$$$ISERR(tSC) tSC
-	quit:$G(prodName)="" $$$ERROR(5001,"No Current Production")
-	do ..LogMessage("Production name "_prodName)
-	
-	// Get Reference to 
-	if '##class(Ens.Director).IsProductionRunning() Quit $$$ERROR(5001,"Production not runnning")
-	
-	set itemName=..#SourceBusinessServiceName
-	do ..LogMessage("""Config Item Name "_itemName_"""")
-	
-	set wasEnabled=""
-	//&SQL(SELECT Enabled INTO :wasEnabled FROM Ens_Config.Item WHERE Production=:prodName and Name=:itemName)
-	//quit:'SQLCODE $$$ERROR("Production "_prodName_", Item "_itemName_" not found")
-	set ..SourceBusinessServiceEnabledAtStart=wasEnabled
-	
-	// Temporarily stop source service as can't have two instances bound to the same port
-	// Change in later version to have increased pool size instead 
-	//Do:wasEnabled ##class(Ens.Director).EnableConfigItem(..#SourceBusinessServiceName,0,1)
-	
-	set tSC=##class(Ens.Director).CreateBusinessService(..#SourceBusinessServiceName,.pBusinessService)
-	quit:$$$ISERR(tSC) tSC
-	set ..SourceBusinessService=pBusinessService
-	set ..SourceBusinessService.%PreserveSession=0
-	kill ..SessionTest
-	
-	Quit $$$OK
-}
+	set routingProcess = ..#PrimaryRoutingProcessName
 
-Method SendMessage(message As EnsLib.HL7.Message = {..HL7Message}, description As %String = "", expectSuccess As %Boolean = 0, expectReturnValue As %String = "", expectReasonValue As %String = "", mode As %String(DISPLAYLIST=",1,2",VALUELIST=",Exact,Contains") = 2)
-{
-	// Reinitalise Session??
-	Set ..SourceBusinessService.%SessionId=""
-	Do ..SourceBusinessService.ForceSessionId()
-	
-	set tSC=..SourceBusinessService.SendRequestSync(..#TargetConfigName,message,.pResponse,-30,description)
-	if $$$ISOK(tSC) $$$TRACE(description_"Sent")
-	
-	if ..SourceBusinessService.%SessionId="" {
-		do ..LogMessage("SessionId not set")
-		quit
-	} else {
-		do ..LogMessage("SessionId was "_..SourceBusinessService.%SessionId)	
-	}
-	
-	set sessionId=..SourceBusinessService.%SessionId
-	// Retry behaviour maybe needed if corresponding process hasn't committed its transaction for rule log entry yet
-	set SQLCODE=""
-	for i=1:1:20 {
-		&SQL(SELECT TOP 1 Reason,ReturnValue INTO :actualReasonValue,:actualReturnValue from Ens_Rule.Log where SessionId=:sessionId ORDER BY ID DESC)
-		quit:SQLCODE=0
-		// Retry if needed
-		hang ((i/10)*2)
-	}
-	if SQLCODE>0 {
-		do ..LogMessage("Reason was empty")
-		set actualReasonValue=""
-		set actualReturnValue=""
-		do $$$AssertEquals("","No record found in Rule Log")
-	} else {
-		do ..LogMessage("Return Value was "_actualReturnValue)
-		do ..LogMessage("Expect Return Value was "_expectReturnValue)
-	}
-	do ..LogMessage("Expect Success is "_expectSuccess)
-	
-	// We use RuleLog returnValue has value to decide whether was routed somewhere
-	// Reason - May note be empty if fails when there is a Truncate rule at the bottom of the rule set.
-	if expectSuccess {
-		// expect pass condition
-		if mode=1 {
-			if $L(expectReturnValue)>0 {
-				do $$$AssertEquals(actualReturnValue,expectReturnValue,"Expect Same Return:"_description_":Expected Return="_expectReturnValue_";Actual Return="_actualReturnValue)	
-			} else {
-				do $$$AssertNotEquals("",returnValue,"Expect Match:"_description_":ReturnValue="_returnValue)
-			}
-			if $L(expectReasonValue)>0 {
-				do $$$AssertEquals(actualReasonValue,expectReasonValue,"Expect Same Reason"_description_":Expected Reason="_expectReasonValue_";Actual Reason="_actualReasonValue)	
-			} else {
-				do $$$AssertNotEquals("",actualReasonValue,"Expect Match:"_description_":ReasonValue="_actualReasonValue)
-			}
-		} else {
-			// mode=2
-			if $L(expectReturnValue)>0 {
-				do $$$AssertTrue(actualReturnValue[expectReturnValue,"Expect contains Return:"_description_":Expected Return="_expectReturnValue_";Actual Return="_actualReturnValue)
-			} else {
-				do $$$AssertEquals("",actualReturnValue,"Expect Match:"_description_":ReturnValue="_actualReturnValue)
-			}
-			if $L(expectReasonValue)>0 {
-				do $$$AssertTrue(actualReasonValue[expectReasonValue,"Expect contains Reason:"_description_":Expected Reason="_expectReasonValue_";Actual Reason="_actualReasonValue)
-			} else {
-				do $$$AssertEquals("",actualReasonValue,"Expect Match:"_description_":ReasonValue="_actualReasonValue)
-			}	
-		}
-	} else {
-		// expect fail condition
-		if mode=1 {
-			if $L(expectReturnValue)>0 {
-				do $$$AssertNotEquals(actualReturnValue,expectReturnValue,"Expect NOT Same Return:"_description_":Expected Return="_expectReturnValue_";Actual Return="_actualReturnValue)
-			} else {
-				do $$$AssertEquals("",actualReturnValue,"Expect No Match:"_description_":ReturnValue="_actualReturnValue)
-			}
-			if $L(expectReasonValue)>0 {
-				do $$$AssertNotEquals(actualReasonValue,expectReasonValue,"Expect NOT Same Reason:"_description_":Expected Reason="_expectReasonValue_";Actual Reason="_actualReasonValue)
-			} else {
-				do $$$AssertEquals("",actualReasonValue,"Expect No Match:"_description_":ReasonValue="_actualReasonValue)
-			}
-		} else {
-			// mode=2
-			if $L(expectReturnValue)>0 {
-				do $$$AssertNotTrue(actualReturnValue[expectReturnValue,"Expect NOT contains Return:"_description_":Expected Return="_expectReturnValue_";Actual Return="_actualReturnValue)
-			} else {
-				do $$$AssertNotEquals("",actualReturnValue,"Expect No Match:"_description_":ReturnValue="_actualReturnValue)
-			}
-			if $L(expectReasonValue)>0 {
-				do $$$AssertNotTrue(actualReasonValue[expectReasonValue,"Expect NOT contains Reason:"_description_":Expected Reason="_expectReasonValue_";Actual Return="_actualReasonValue)
-			} else {
-				do $$$AssertNotEquals("",actualReasonValue,"Expect No Match:"_description_":ReasonValue="_actualReasonValue)
-			}
-		}
-	}
-}
-
-/// Run by <B>RunTest</B> once after all test methods in the test class are run. Can be used to tear down a test environment that was set up by <B>OnBeforeAllTests</B> See example in <b>OnBeforeAllTests</b>. 
-Method OnAfterAllTests() As %Status
-{
-	// Restart the Service after testing to allow it to operate as normal
-	Do:..SourceBusinessServiceEnabledAtStart ##class(Ens.Director).EnableConfigItem(..#SourceBusinessServiceName,1,1)
- 	Quit $$$OK
-}
-
-ClassMethod GetSourceMessage() As EnsLib.HL7.Message
-{
-	#dim SourceMessage as EnsLib.HL7.Message
-	set xdata=##class(%Dictionary.CompiledXData).%OpenId(..%ClassName(1)_"||SourceMessage",0)
-	quit:'$IsObject(xdata) $$$NULLOREF
-	set lines=""
-	while 'xdata.Data.AtEnd
-	{
-		set line=$ZSTRIP(xdata.Data.ReadLine(),"<w")
-		continue:line=""
-		continue:$Extract(line,1)="<" // ignore opening or closing XML tags and start CData tag
-		continue:$Extract(line,1)="]" // ignore ]]> closing CDATA
-		set lines=lines_($S($L(lines)=0:"",1:$C(..#NewLine)))_line
-	}
-	set SourceMessage=##class(EnsLib.HL7.Message).ImportFromString(lines,.tSC)
-	quit:$$$ISERR(tSC) $$$NULLOREF
-	set SourceMessage.DocType=..#HL7Schema
-	set tSC=SourceMessage.PokeDocType(..#HL7Schema)
-	quit SourceMessage
+	set message=..HL7Message.%ConstructClone(1)
+	do message.PokeDocType(message.DocType)
+	do message.SetValueAt("SYSA","MSH:3.1")
+	set expectSuccess=1
+	set expectReturn="send:"_ReturnA01
+	set expectReason="rule#8"
+	do ..SendMessageToRouter(message,"TestMessageA01",routingProcess, expectSuccess, expectReturn, expectReason)
 }
 
 /****Helper Methods ****/
@@ -447,12 +275,18 @@ Method SendMessageReturnOutput(message As EnsLib.HL7.Message = {..HL7Message}, d
 	}
 }
 
-XData SourceMessage
+XData SourceMessageA01
 {
 <test><![CDATA[
-	MSH|^~\&|FRM|FRM5T|SYSA|SYSA|202207121010||OUL^R22^OUL_R22|1234567|P|2.5|||||GBR||EN
-	]]>
-</test>
+MSH|^~\&|MESA_RPT_MGR|UVMC|iFW|XYZ|||ORU^R01|MESA3b|P|2.4||||||||
+PID|||CR3^^^ADT1||CRTHREE^PAUL|||||||||||||PatientAcct||||||||||||
+PD1||||GERM|
+PV1||1|CE||||12345^SMITH^BARON^H|||||||||||
+OBR||1234567|||||20010501141500.0000|||||||||||||||||ABC|F||||||||||||||||||
+OBX|1|HD|13579.000^WNL^LOINC^^^||1.113654.1.2001.30.2.1||||||F||||||
+OBX|2|TX|SR Text||Radiology Report History Cough Findings PA evaluation of the chest demonstrates the lungs to be expanded and clear.  Conclusions Normal PA chest x-ray.||||||F||||||
+CTI|study1|^1|^10_EP1
+]]></test>
 }
 
 }
