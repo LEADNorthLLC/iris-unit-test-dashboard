@@ -29,7 +29,7 @@ Parameter TargetConfigName = "CGHOruRouter";
 Parameter PrimaryRoutingProcessName = "CGHOruRouter";
 
 /// Secondary routing process name on production
-Parameter SecondaryRoutingProcessName = "DataWarehouseHL7Outbound";
+Parameter SecondaryRoutingProcessName = "DataWarehouseHL7Outbound-CGH";
 
 Parameter AssigningAuthority = "CGH";
 

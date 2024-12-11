@@ -29,7 +29,7 @@ Parameter TargetConfigName = "SGHAdtRouter";
 Parameter PrimaryRoutingProcessName = "SGHAdtRouter";
 
 /// Secondary routing process name on production
-Parameter SecondaryRoutingProcessName = "DataWarehouseHL7Outbound";
+Parameter SecondaryRoutingProcessName = "DataWarehouseHL7Outbound-SGH";
 
 Parameter AssigningAuthority = "SGH";
 
