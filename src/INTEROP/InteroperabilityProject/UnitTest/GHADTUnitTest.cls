@@ -37,50 +37,41 @@ Parameter NewLine = 10;
 
 Method TestMessageA01()
 {
-        Set ReturnA01 = ..#PrimaryRoutingProcessName_":TransformA01"
+        Set ReturnA01 = ..#PrimaryRoutingProcessName_":DataWarehouseHL7Outbound-GH"
         #dim message as EnsLib.HL7.Message
 
         // Load new HL7Message per UnitTest
         set ..HL7Message=..GetMessage("SourceMessageA01")
         quit:'$IsObject(..HL7Message) $$$ERROR(5001,"Failed to correlate Xdata for Source Message")
-        
         set routingProcess = ..#PrimaryRoutingProcessName
 
         set message=..HL7Message.%ConstructClone(1)
         do message.PokeDocType(message.DocType)
         do message.SetValueAt("SYSA","MSH:3.1")
+
         set expectSuccess=1
         set expectReturn="send:"_ReturnA01
         set expectReason="rule#8"
+        
         do ..SendMessageToRouter(message,"TestMessageA01",routingProcess, expectSuccess, expectReturn, expectReason)
 }
 
 XData SourceMessageA01
 {
 <test><![CDATA[
-        MSH|^~\&|REGADT|COUNTYGEN|IFENG||199601061253||ADT^A01|000001|P|2.3.1|1||
-        EVN|A01|199601061000|199601101400|1
-        PID|||999473857^^^GENHOSP|253763|MASSIE^JAMES^A||19560129|M|||87 MAIN ST^^CAMBRIDGE^MA^02142^||(900)485-5344|(900)485-5344|ENGLISH|S|C|10199925|371-66-9256
-        PD1|||||||||
-        NK1||||||
-        PV1||O|||||0148^ADDISON^JAMES|0148^ADDISON^JAMES|0148^ADDISON^JAMES|AMB|||||||0148^ADDISON^JAMES|S|1400|A|||||||||||||||||GENHOSP
-        PV2||||||||199601101400|199601101400
-        DB1|||||||||||
-        OBX||ST|1010.1^BODY WEIGHT||100|kg
-        OBX||ST|1010.1^HEIGHT||190|cm
-        AL1|||||||||||
-        DG1|||||||||||
-        DRG|||||||||||
-        PR1|||||||||||
-        ROL|||||||||||
-        GT1|||||||||||
-        IN1|||||||||||
-        IN2|||||||||||
-        IN3|||||||||||
-        ACC|||||||||||
-        UB1|||||||||||
-        UB2|||||||||||
-        ]]></test>
+        MSH|^~\&|AccMgr|1|||20050110045504+0700||ADT^A01|599102|P|2.3||| 
+        EVN|A01|20050110045502+0700||||| 
+        PID|1||10006579^^^1^MR^1||DUCK^DONALD^D||19241010|M||1|111 DUCK ST^^FOWL^CA^999990000^^M|1|8885551212|8885551212|1|2||40007716^^^AccMgr^VN^1|123121234|||||||||||NO 
+        NK1|1|DUCK^HUEY|SO|3583 DUCK RD^^FOWL^CA^999990000|8885552222||Y|||||||||||||| 
+        PV1|1|I|PREOP^101^1^1^^^S|3|||37^DISNEY^WALT^^^^^^AccMgr^^^^CI|||01||||1|||37^DISNEY^WALT^^^^^^AccMgr^^^^CI|2|40007716^^^AccMgr^VN|4|||||||||||||||||||1||G|||20050110045502+0700|||||| 
+        GT1|1|8291|DUCK^DONALD^D||111^DUCK ST^^FOWL^CA^999990000|8885551212||19241010|M||1|123121234||||#Cartoon Ducks Inc|111^DUCK ST^^FOWL^CA^999990000|8885551212||PT| 
+        DG1|1|I9|71596^OSTEOARTHROS NOS-L/LEG ^I9|OSTEOARTHROS NOS-L/LEG ||A| 
+        IN1|1|MEDICARE|3|MEDICARE|||||||Cartoon Ducks Inc|19891001|||4|DUCK^DONALD^D|1|19241010|111^DUCK ST^^FOWL^CA^999990000|||||||||||||||||123121234A||||||PT|M|111 DUCK ST^^FOWL^CA^999990000|||||8291 
+        IN2|1||123121234|Cartoon Ducks Inc|||123121234A|||||||||||||||||||||||||||||||||||||||||||||||||||||||||8885551212 
+        IN1|2|NON-PRIMARY|9|MEDICAL MUTUAL CALIF.|PO BOX 94776^^HOLLYWOOD^CA^441414776||8003621279|PUBSUMB|||Cartoon Ducks Inc||||7|DUCK^DONALD^D|1|19241010|111 DUCK ST^^FOWL^CA^999990000|||||||||||||||||056269770||||||PT|M|111^DUCK ST^^FOWL^CA^999990000|||||8291 
+        IN2|2||123121234|Cartoon Ducks Inc||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||8885551212 
+        IN1|3|SELF PAY|1|SELF PAY|||||||||||5||1
+]]></test>
 }
 
 }
