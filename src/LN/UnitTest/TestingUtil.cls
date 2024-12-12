@@ -49,7 +49,7 @@ ClassMethod BuildTestStatus(projectName As %String, namespace As %String = "", p
 	else {
 		set tPackagePath = packagePath	
 	}
-	#dim classList As List of UnitTestClass
+	#dim classList As List of LN.UnitTest.Model.UnitTestClass
 	
 	//Call BuildProject
 	$$$ThrowOnError(##class(LN.UnitTest.ProjectUtil).BuildProject(projectName,namespace,packagePath,.projectObj))
@@ -101,6 +101,70 @@ ClassMethod BuildTestStatus(projectName As %String, namespace As %String = "", p
 		
         do projectObj.Namespace.UnitTestClasses.Insert(unitTestObj)   
 	  }
+	}
+	catch(ex) {
+		w ex.Status	
+	}
+	Quit tStatus
+}
+
+ClassMethod RunAllTests(projectName As %String, namespace As %String = "", packagePath As %String = "", ByRef projectObj As LN.UnitTest.Model.Project) As %Status
+{
+	#dim namespaceObj As LN.UnitTest.Model.Namespace
+	
+	Set tStatus = $$$OK
+	try {
+
+	if projectName = "" {
+			$$$ThrowError($$$GeneralError,"Project Name required")
+	}
+
+	//if namespace is empty
+	if namespace ="" {
+		set tNamespace = $GET(^UnitTest("Namespace"))
+		if tNamespace = "" {
+			
+			$$$ThrowError($$$GeneralError,"Namespace parameter required or set ^UnitTest(""Namespace"")")
+		}	
+	}	
+	else {
+		set tNamespace = namespace	
+	}
+
+	//if package path is empty
+	if packagePath ="" {
+		set tPackagePath = $GET(^UnitTest("PackagePath"))
+		if tPackagePath = "" {
+			
+			$$$ThrowError($$$GeneralError,"PackagePath parameter required or set ^UnitTest(""PackagePath"")")
+		}	
+	}	
+	else {
+		set tPackagePath = packagePath	
+	}
+	
+	//CNR: TODO: Set namespace and ^UnitTestRoot base directory if not set
+	
+	#dim classList As List of LN.UnitTest.Model.UnitTestClass
+	
+	//Call BuildProject
+	$$$ThrowOnError(##class(LN.UnitTest.ProjectUtil).BuildProject(projectName,namespace,packagePath,.projectObj))
+	set classList = projectObj.Namespace.UnitTestClasses
+	
+	
+	//Loop through the Unit Test cases
+	#dim unitTestObj As LN.UnitTest.Model.UnitTestClass
+	#dim testCaseObj As LN.UnitTest.Model.TestCase
+	#dim testCaseResultObj As LN.UnitTest.Model.TestCaseResult
+	For index=1:1:classList.Count() {
+		
+		Set unitTestObj = classList.GetAt(index)
+		//CNR: TODO - inspect the class using %Dictionary and get the TestSuite property
+		//Check to see if that folder exists beneath ^UnitTestRoot and if it doesn't, create it programmatically
+		//This is a good candidate for a method 
+		
+		//Run each unit test class
+	}
 	}
 	catch(ex) {
 		w ex.Status	
