@@ -17,6 +17,7 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 {
 <Routes>
     <Route Url="/" Method="GET" Call="GetProjectInfo"/>
+	<Route Url="/results" Method="GET" Call="GetTestResults"/>
 	<Route Url="/transform/" Method="POST" Call="TransformCCD"/>
 	<Route Url="/xslt/" Method="POST" Call="TestXSL"/>
   </Routes>
@@ -28,6 +29,12 @@ ClassMethod GetProjectInfo()
 {
 
 	Return ##class(UnitTest.Dashboard.REST.ProjectService).GetProjectInfo()
+}
+
+ClassMethod GetTestResults()
+{
+
+	Return ##class(UnitTest.Dashboard.REST.ProjectService).GetTestResults()
 }
 
 ClassMethod GetXPathValue() As %Status
