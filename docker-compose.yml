@@ -12,9 +12,18 @@ services:
       - 63773
     volumes:
       - ./:/home/irisowner/dev
-  react:
+      
+  # react:
+  #   build:
+  #     context: ./frontend/CCD-TOOLS-Frontend
+  #     dockerfile: Dockerfile
+  #   restart: always
+  #   ports:
+  #       - 4000:3000
+  
+  test-ui:
     build:
-      context: ./frontend/CCD-TOOLS-Frontend
+      context: ./testing-dashboard-frontend
       dockerfile: Dockerfile
     restart: always
     ports:

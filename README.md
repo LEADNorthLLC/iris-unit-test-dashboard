@@ -60,11 +60,11 @@ Then open IRIS terminal:
 iris session IRIS
 ```
 
-## CCD DevTools UI:
+## Testing Dashboard UI:
 
 The UI is served from a second container and is available after docker startup at: 
 
-[CCD DevTools URL](http://localhost:4000)
+[Testing Dashboard URL](http://localhost:4000)
 
 
 
