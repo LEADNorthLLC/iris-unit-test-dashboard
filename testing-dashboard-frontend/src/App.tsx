@@ -18,7 +18,7 @@ function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'tests' | 'create'>('tests');
   const [settings, setSettings] = useState<SettingsType>({
-    apiUrl: 'http://localhost:62773/csp/unittest/service/',
+    apiUrl: 'http://localhost:62773/csp/unittest/service/results',
     useSampleData: false,
     useSampleDataOnError: true,
   });

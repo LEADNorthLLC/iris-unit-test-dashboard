@@ -1,4 +1,4 @@
-Class INTEROP.InteroperabilityProject.UnitTest.CGHORUUnitTets Extends LN.UnitTest.RuleSet.HL7
+Class INTEROP.InteroperabilityProject.UnitTest.CGHORUUnitTest Extends LN.UnitTest.RuleSet.HL7
 {
 
 /// <pre>
