@@ -6,7 +6,7 @@ Property name As %String;
 
 Property label As %String;
 
-Property status As %String [ InitialExpression = "pending" ];
+Property results As list Of TestCaseResult;
 
 Storage Default
 {

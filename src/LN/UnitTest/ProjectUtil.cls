@@ -60,7 +60,7 @@ ClassMethod BuildProject(projectName As %String, namespace As %String = "", pack
 		Set unitTestObj = ##class(LN.UnitTest.Model.UnitTestClass).%New()
         set unitTestObj.name = tCurrentClass
         //w "Opening class : "_tCurrentClass,!
-        set unitTestObj.testCaseList = ..AddTestCasesToClass( tCurrentClass , tNamespace, unitTestObj)
+        $$$ThrowOnError(..AddTestCasesToClass( tCurrentClass , tNamespace, unitTestObj))
     	//insert the unitTestObj into the namespace object
     	do namespaceObj.UnitTestClasses.Insert(unitTestObj)    
     }
@@ -93,9 +93,11 @@ ClassMethod AddTestCasesToClass(className As %String, namespace As %String = "",
     Try {
 		set classObj = ##class(%Dictionary.ClassDefinition).%OpenId(className)	    
 	    // Iterate through the methods
-        Set testCase = ##class(LN.UnitTest.Model.TestCase).%New()
+        
         For int=1:1:classObj.Methods.Count() {
+	        Set testCase = ##class(LN.UnitTest.Model.TestCase).%New()
             Set method = classObj.Methods.GetAt(int)
+            //w method.Name,!
             if $EXTRACT(method.Name,1,4)="Test" {
 	            Set testCase.name = method.Name
 	            Do unitTest.testCaseList.Insert(testCase) //add test case to list
