@@ -1,8 +1,11 @@
 import React from 'react';
 import { useState } from 'react';
-import { CheckCircle2, XCircle, Clock, Play } from 'lucide-react';
+import { CheckCircle2, XCircle, Clock, Play, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import axios from 'axios';
 import type { TestCase } from '../types/testing';
+
+type SortField = 'name' | 'datetime';
+type SortDirection = 'asc' | 'desc';
 
 interface TestDetailsPanelProps {
   testCases: TestCase[];
@@ -11,22 +14,57 @@ interface TestDetailsPanelProps {
 
 export const TestDetailsPanel: React.FC<TestDetailsPanelProps> = ({ testCases, className }) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortField, setSortField] = useState<SortField>('name');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const itemsPerPage = 10;
-  const totalPages = Math.ceil(testCases.length / itemsPerPage);
   
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const getSortIcon = (field: SortField) => {
+    if (sortField !== field) return <ArrowUpDown className="w-4 h-4" />;
+    return sortDirection === 'asc' ? 
+      <ArrowUp className="w-4 h-4" /> : 
+      <ArrowDown className="w-4 h-4" />;
+  };
+
   const handleRunTest = async (testName: string) => {
     try {
       // Placeholder for future implementation
-
+      // await axios.post('/api/test/run', {
+      //   className,
+      //   testName
+      // });
+      console.log('Running test:', { className, testName });
     } catch (error) {
       console.error('Failed to run test:', error);
     }
   };
 
+  // Sort test cases
+  const sortedTestCases = [...testCases].sort((a, b) => {
+    if (sortField === 'name') {
+      return sortDirection === 'asc' 
+        ? a.name.localeCompare(b.name)
+        : b.name.localeCompare(a.name);
+    } else {
+      const dateA = a.datetime ? new Date(a.datetime).getTime() : 0;
+      const dateB = b.datetime ? new Date(b.datetime).getTime() : 0;
+      return sortDirection === 'asc' ? dateA - dateB : dateB - dateA;
+    }
+  });
+
   // Get current page's test cases
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = testCases.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = sortedTestCases.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(sortedTestCases.length / itemsPerPage);
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -109,17 +147,29 @@ export const TestDetailsPanel: React.FC<TestDetailsPanelProps> = ({ testCases, c
               Status
             </th>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Test Case Name
+              <button
+                onClick={() => handleSort('name')}
+                className="inline-flex items-center space-x-1 hover:text-gray-700"
+              >
+                <span>Test Case Name</span>
+                {getSortIcon('name')}
+              </button>
             </th>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-96">
               Description
             </th>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Date/Time
+              <button
+                onClick={() => handleSort('datetime')}
+                className="inline-flex items-center space-x-1 hover:text-gray-700"
+              >
+                <span>Date/Time</span>
+                {getSortIcon('datetime')}
+              </button>
             </th>
-            <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+            {/* <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
               Actions
-            </th>
+            </th>  */}
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
@@ -139,15 +189,15 @@ export const TestDetailsPanel: React.FC<TestDetailsPanelProps> = ({ testCases, c
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {testCase.datetime || '-'}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-right">
+              {/* <td className="px-6 py-4 whitespace-nowrap text-right">
                 <button
                   onClick={() => handleRunTest(testCase.name)}
                   className="inline-flex items-center p-1 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                   title="Run Test"
                 >
-                  <Play className="h-4 w-4" />
+                   <Play className="h-4 w-4" /> 
                 </button>
-              </td>
+              </td> */}
             </tr>
           ))}
         </tbody>

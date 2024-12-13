@@ -76,7 +76,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
           <div className="space-y-6">
             <div>
               <label htmlFor="apiUrl" className="block text-sm font-medium text-gray-700 mb-2">
-                API URL
+                Test Results API URL
               </label>
               <input
                 type="text"
@@ -97,6 +97,38 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
               {!settings.useSampleData && !urlValidation.isValid && (
                 <p className="mt-1 text-sm text-red-600">
                   {urlValidation.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="runTestsUrl" className="block text-sm font-medium text-gray-700 mb-2">
+                Run All Tests URL
+              </label>
+              <input
+                type="text"
+                id="runTestsUrl"
+                name="runTestsUrl"
+                value={settings.runTestsUrl}
+                disabled={settings.useSampleData}
+                onChange={(e) => {
+                  const url = e.target.value;
+                  if (url.trim() === '' || validateUrl(url)) {
+                    onSettingsChange({ ...settings, runTestsUrl: url });
+                  }
+                }}
+                className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                  settings.useSampleData 
+                    ? 'bg-gray-100 text-gray-500 cursor-not-allowed' 
+                    : validateUrl(settings.runTestsUrl)
+                      ? 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                      : 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                }`}
+                placeholder="Enter Run All Tests URL"
+              />
+              {!settings.useSampleData && !validateUrl(settings.runTestsUrl) && settings.runTestsUrl.trim() !== '' && (
+                <p className="mt-1 text-sm text-red-600">
+                  Please enter a valid URL
                 </p>
               )}
             </div>

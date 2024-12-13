@@ -15,11 +15,13 @@ export const TestListItem: React.FC<TestListItemProps> = ({ unitTestClass }) => 
   const [showDetails, setShowDetails] = useState(false);
   const shortName = getShortClassName(unitTestClass.name);
   const testCount = unitTestClass.testCaseList?.length || 0;
+  const hasTests = testCount > 0;
 
   const handleRunTests = async () => {
     try {
       // Placeholder for future implementation
-      
+
+      console.log('Running tests for:', unitTestClass.name);
     } catch (error) {
       console.error('Failed to run tests:', error);
     }
@@ -40,13 +42,15 @@ export const TestListItem: React.FC<TestListItemProps> = ({ unitTestClass }) => 
           <TestStatusIndicators testCases={unitTestClass.testCaseList || []} />
         </td>
         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-          <button
+          {/* <button
             onClick={handleRunTests}
+            disabled={!hasTests}
             className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-2"
+            title={hasTests ? 'Run all tests' : 'No tests available to run'}
           >
             Run All Tests
             <Play className="ml-2 -mr-1 h-4 w-4" />
-          </button>
+          </button> */}
           <button
             onClick={() => setShowDetails(!showDetails)}
             className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -68,6 +72,7 @@ export const TestListItem: React.FC<TestListItemProps> = ({ unitTestClass }) => 
       {showDetails && (
         <tr>
           <td colSpan={4} className="px-6 py-4 bg-gray-50">
+            <p className="px-6 py-4" >Hello Panel</p>
             <TestDetailsPanel 
               testCases={unitTestClass.testCaseList || []}
               className={unitTestClass.name}

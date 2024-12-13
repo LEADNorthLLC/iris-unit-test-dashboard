@@ -27,7 +27,7 @@ export const TabView: React.FC<TabViewProps> = ({
           >
             View Tests
           </button>
-          <button
+          {/* <button
             onClick={() => onTabChange('create')}
             className={`py-4 px-6 inline-flex items-center gap-2 border-b-2 font-medium text-sm ${
               activeTab === 'create'
@@ -36,7 +36,7 @@ export const TabView: React.FC<TabViewProps> = ({
             }`}
           >
             Create Test
-          </button>
+          </button> */}
         </div>
         <button
           onClick={onSettingsClick}

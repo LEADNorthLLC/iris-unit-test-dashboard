@@ -11,6 +11,7 @@ export function useDataFetching(settings: Settings) {
   const [lastFetchTime, setLastFetchTime] = useState<Date | null>(null);
 
   const fetchData = useCallback(async () => {
+    setLoading(true);
     if (settings.useSampleData) {
       setData(sampleData);
       setError(null);
@@ -45,5 +46,5 @@ export function useDataFetching(settings: Settings) {
     return () => clearInterval(intervalId);
   }, [fetchData]);
 
-  return { data, loading, error, lastFetchTime };
+  return { data, loading, error, lastFetchTime, fetchData };
 }
