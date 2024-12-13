@@ -55,7 +55,7 @@ function App() {
               <div className="flex items-center space-x-4 mb-6">
                 
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900 pb-2">Integration Testing Dashboard</h1>
+                  <h1 className="text-2xl font-bold text-gray-900 pb-2">Unit Testing Dashboard</h1>
                 
                   <h2 className="pt-2">
                     {data?.Name || 'Testing Project'}
