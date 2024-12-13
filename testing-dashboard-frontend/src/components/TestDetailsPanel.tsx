@@ -1,17 +1,28 @@
 import React from 'react';
 import { useState } from 'react';
-import { CheckCircle2, XCircle, Clock } from 'lucide-react';
+import { CheckCircle2, XCircle, Clock, Play } from 'lucide-react';
+import axios from 'axios';
 import type { TestCase } from '../types/testing';
 
 interface TestDetailsPanelProps {
   testCases: TestCase[];
+  className?: string;
 }
 
-export const TestDetailsPanel: React.FC<TestDetailsPanelProps> = ({ testCases }) => {
+export const TestDetailsPanel: React.FC<TestDetailsPanelProps> = ({ testCases, className }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const totalPages = Math.ceil(testCases.length / itemsPerPage);
   
+  const handleRunTest = async (testName: string) => {
+    try {
+      // Placeholder for future implementation
+
+    } catch (error) {
+      console.error('Failed to run test:', error);
+    }
+  };
+
   // Get current page's test cases
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -106,6 +117,9 @@ export const TestDetailsPanel: React.FC<TestDetailsPanelProps> = ({ testCases })
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Date/Time
             </th>
+            <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
@@ -124,6 +138,15 @@ export const TestDetailsPanel: React.FC<TestDetailsPanelProps> = ({ testCases })
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {testCase.datetime || '-'}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-right">
+                <button
+                  onClick={() => handleRunTest(testCase.name)}
+                  className="inline-flex items-center p-1 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  title="Run Test"
+                >
+                  <Play className="h-4 w-4" />
+                </button>
               </td>
             </tr>
           ))}

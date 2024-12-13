@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Play } from 'lucide-react';
+import axios from 'axios';
 import type { UnitTestClass } from '../types/testing';
 import { TestDetailsPanel } from './TestDetailsPanel';
 import { TestStatusIndicators } from './TestStatusIndicators';
@@ -14,6 +15,15 @@ export const TestListItem: React.FC<TestListItemProps> = ({ unitTestClass }) => 
   const [showDetails, setShowDetails] = useState(false);
   const shortName = getShortClassName(unitTestClass.name);
   const testCount = unitTestClass.testCaseList?.length || 0;
+
+  const handleRunTests = async () => {
+    try {
+      // Placeholder for future implementation
+      
+    } catch (error) {
+      console.error('Failed to run tests:', error);
+    }
+  };
 
   return (
     <>
@@ -30,6 +40,13 @@ export const TestListItem: React.FC<TestListItemProps> = ({ unitTestClass }) => 
           <TestStatusIndicators testCases={unitTestClass.testCaseList || []} />
         </td>
         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+          <button
+            onClick={handleRunTests}
+            className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-2"
+          >
+            Run All Tests
+            <Play className="ml-2 -mr-1 h-4 w-4" />
+          </button>
           <button
             onClick={() => setShowDetails(!showDetails)}
             className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -51,7 +68,10 @@ export const TestListItem: React.FC<TestListItemProps> = ({ unitTestClass }) => 
       {showDetails && (
         <tr>
           <td colSpan={4} className="px-6 py-4 bg-gray-50">
-            <TestDetailsPanel testCases={unitTestClass.testCaseList || []} />
+            <TestDetailsPanel 
+              testCases={unitTestClass.testCaseList || []}
+              className={unitTestClass.name}
+            />
           </td>
         </tr>
       )}
