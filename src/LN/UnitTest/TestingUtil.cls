@@ -108,7 +108,7 @@ ClassMethod BuildTestStatus(projectName As %String, namespace As %String = "", p
 	Quit tStatus
 }
 
-ClassMethod RunAllTests(projectName As %String, namespace As %String = "", packagePath As %String = "", ByRef projectObj As LN.UnitTest.Model.Project) As %Status
+ClassMethod RunUnitTest(projectName As %String, namespace As %String = "", packagePath As %String = "", ByRef projectObj As LN.UnitTest.Model.Project, targetClassName As %String = "*") As %Status
 {
 	#dim namespaceObj As LN.UnitTest.Model.Namespace
 	
@@ -143,33 +143,99 @@ ClassMethod RunAllTests(projectName As %String, namespace As %String = "", packa
 		set tPackagePath = packagePath	
 	}
 	
-	//CNR: TODO: Set namespace and ^UnitTestRoot base directory if not set
+	//Set namespace and ^UnitTestRoot base directory if not set
+	Set originalNS = $namespace //set namespace back at the end
+	zn namespace
 	
+	if $DATA(^UnitTestRoot) = 0 {
+		//create the directory and then set the global
+		set ^UnitTestRoot = $GET(^UnitTest("TestDirectory"))
+		if $DATA(^UnitTestRoot)=0 {
+			$$$ThrowError($$$GeneralError,"^UnitTestRoot needs to be defined")
+		}
+	}
+	If '##class(%File).DirectoryExists($GET(^UnitTestRoot)) {
+		Set tStatus = ##class(%File).CreateDirectory($GET(^UnitTestRoot))
+				Quit:($$$ISERR(tStatus))
+	}	
+		
 	#dim classList As List of LN.UnitTest.Model.UnitTestClass
 	
 	//Call BuildProject
 	$$$ThrowOnError(##class(LN.UnitTest.ProjectUtil).BuildProject(projectName,namespace,packagePath,.projectObj))
 	set classList = projectObj.Namespace.UnitTestClasses
 	
-	
+	#dim classObj As %Dictionary.ClassDefintion
 	//Loop through the Unit Test cases
 	#dim unitTestObj As LN.UnitTest.Model.UnitTestClass
 	#dim testCaseObj As LN.UnitTest.Model.TestCase
 	#dim testCaseResultObj As LN.UnitTest.Model.TestCaseResult
-	For index=1:1:classList.Count() {
-		
-		Set unitTestObj = classList.GetAt(index)
-		//CNR: TODO - inspect the class using %Dictionary and get the TestSuite property
-		//Check to see if that folder exists beneath ^UnitTestRoot and if it doesn't, create it programmatically
-		//This is a good candidate for a method 
-		
-		//Run each unit test class
+	if targetClassName = "*" {
+		For index=1:1:classList.Count() {
+			Set unitTestObj = classList.GetAt(index)
+			Set className = unitTestObj.name 
+			set tStatus = ..RunSingleTest(className)
+			Quit:($$$ISERR(tStatus))	
+		}
 	}
+	else {
+		//single test run
+		set tStatus = ..RunSingleTest(targetClassName)
+		Quit:($$$ISERR(tStatus))	
+	}
+	//return to previous namespace
+	zn originalNS
+	
+	//update the projectObj with the test statuses
+	$$$ThrowOnError(##class(LN.UnitTest.TestingUtil).BuildTestStatus(projectName,namespace,packagePath,.projectObj))
+	
 	}
 	catch(ex) {
 		w ex.Status	
 	}
 	Quit tStatus
+}
+
+/// Helper method: Run Single Unit Test
+/// Inspect the class using %Dictionary and get the TestSuite property
+/// Check to see if that folder exists beneath ^UnitTestRoot and if it doesn't, 
+/// create it programmatically
+ClassMethod RunSingleTest(className As %String) As %Status
+{
+	Set tStatus = $$$OK			
+	Set classObj = ##class(%Dictionary.ClassDefinition).%OpenId(className)
+	if $IsObject(classObj) {
+		Set testSuite = ..GetParameterValue(className,"TestSuite")
+		Set testDirectory = ^UnitTestRoot_"/"_testSuite
+			
+		//create TestSuite sub-folder
+		If '##class(%File).DirectoryExists(testDirectory) {
+			Set tStatus = ##class(%File).CreateDirectory(testDirectory)
+			Quit:($$$ISERR(tStatus))
+		}
+	
+		//Finally run unit tests using a dynamic call
+		do $ZOBJCLASSMETHOD(className,"Debug")
+	}
+	Quit tStatus
+}
+
+/// Helper method: Returns the value of the class Parameter
+ClassMethod GetParameterValue(className As %String, parameterName As %String) As %String
+{
+	set returnValue = ""
+	
+	set classObj = ##class(%Dictionary.ClassDefinition).%OpenId(className)
+	if $IsObject(classObj) {
+		// get list of properties
+ 		Set propCount = classObj.Parameters.Count()
+ 		For i = 1:1:propCount {
+     		if classObj.Parameters.GetAt(i).Name = parameterName {
+	      	set returnValue = classObj.Parameters.GetAt(i).Default		
+     		}
+    	}
+	}
+	quit returnValue
 }
 
 }

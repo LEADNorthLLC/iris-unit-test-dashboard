@@ -4,6 +4,9 @@ Class UnitTest.Dashboard.REST.ServiceMap Extends UnitTest.Dashboard.REST.Service
 
 /** Change Log
 2024-01-20 - Chi Nguyen-Rettig: initial
+2024-12-10 - Chi Nguyen-Rettig : Created
+2024-12-12 - Chi Nguyen-Rettig : Updated with Test Results 
+2024-12-12 - Chi Nguyen-Rettig : Add RunUnitTest 
 **/
 Parameter Version = "1.0.0";
 
@@ -18,12 +21,20 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 <Routes>
     <Route Url="/" Method="GET" Call="GetProjectInfo"/>
 	<Route Url="/results" Method="GET" Call="GetTestResults"/>
-	<Route Url="/transform/" Method="POST" Call="TransformCCD"/>
-	<Route Url="/xslt/" Method="POST" Call="TestXSL"/>
+	<Route Url="/runtest" Method="POST" Call="RunUnitTest"/>
+	
   </Routes>
 }
 
-// Return project tree
+// Run Unit Tests
+
+ClassMethod RunUnitTest()
+{
+
+	Return ##class(UnitTest.Dashboard.REST.ProjectService).RunUnitTest()
+}
+
+// Return project object
 
 ClassMethod GetProjectInfo()
 {
