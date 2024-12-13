@@ -11,7 +11,11 @@ do ##class(SYS.Container).QuiesceForBundling()
 Do ##class(Security.Users).UnExpireUserPasswords("*")
 s props("Database")="HSLIB",sc=##Class(Config.MapPackages).Create("%ALL","HS",.props)
 do ##class(%EnsembleMgr).EnableNamespace("IRISAPP")
+zn "IRISAPP"
 zpm "load /home/irisowner/dev/ -v":1:1
+Do ##class(Ens.Director).SetAutoStart("IRISAPPPKG.FoundationProduction")
+Do ##class(Ens.Director).StartProduction("IRISAPPPKG.FoundationProduction")
+    
 halt
 EOF
 

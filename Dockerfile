@@ -41,9 +41,11 @@ RUN \
   set webProperties("AutheEnabled") = 64 \
   set sc = ##class(Security.Applications).Create(webName, .webProperties) \
   write sc \
-  write "Web application "_webName_" has been created!" 
+  write "Web application "_webName_" has been created!" \
 
-  #zn "IRISAPP" \
+  zn "IRISAPP" \
+  Do ##class(Ens.Director).SetAutoStart("IRISAPPPKG.FoundationProduction")\
+  Do ##class(Ens.Director).StartProduction("IRISAPPPKG.FoundationProduction")
   #zpm "install swagger-ui" \
   #zpm "install webterminal"
   

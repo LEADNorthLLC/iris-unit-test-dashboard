@@ -145,16 +145,20 @@ ClassMethod RunUnitTest(projectName As %String, namespace As %String = "", packa
 	
 	//Set namespace and ^UnitTestRoot base directory if not set
 	Set originalNS = $namespace //set namespace back at the end
-	zn namespace
-	
-	if $DATA(^UnitTestRoot) = 0 {
+	zn tNamespace
+	set ^zStatus = "change namespace"
+	if ($DATA(^UnitTestRoot) = 0) || (^UnitTestRoot = "")  {
+		set ^zStatus = "no ^UnitTestRoot"
 		//create the directory and then set the global
 		set ^UnitTestRoot = $GET(^UnitTest("TestDirectory"))
-		if $DATA(^UnitTestRoot)=0 {
+		if ($DATA(^UnitTestRoot) = 0) || (^UnitTestRoot = "") {
+			set ^zStatus = "still no ^UnitTestRoot"
 			$$$ThrowError($$$GeneralError,"^UnitTestRoot needs to be defined")
 		}
 	}
+	set ^zStatus = "something wrong with unittest check"
 	If '##class(%File).DirectoryExists($GET(^UnitTestRoot)) {
+		set ^zStatus = "creating directory"
 		Set tStatus = ##class(%File).CreateDirectory($GET(^UnitTestRoot))
 				Quit:($$$ISERR(tStatus))
 	}	
@@ -187,7 +191,7 @@ ClassMethod RunUnitTest(projectName As %String, namespace As %String = "", packa
 	zn originalNS
 	
 	//update the projectObj with the test statuses
-	$$$ThrowOnError(##class(LN.UnitTest.TestingUtil).BuildTestStatus(projectName,namespace,packagePath,.projectObj))
+	//$$$ThrowOnError(##class(LN.UnitTest.TestingUtil).BuildTestStatus(projectName,namespace,packagePath,.projectObj))
 	
 	}
 	catch(ex) {

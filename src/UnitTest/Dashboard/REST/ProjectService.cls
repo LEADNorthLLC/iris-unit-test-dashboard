@@ -14,9 +14,13 @@ ClassMethod RunUnitTest(className As %String = "*") As %Status
 		#;Dispatch request to production
 		#Dim tResponse as %String
 
+		set ^zStatus = "RunUnitTest()"
+
 		//this method should return a response that is project Object	 	
     	$$$ThrowOnError(##class(LN.UnitTest.TestingUtil).RunUnitTest("InteroperabilityProject", "IRISAPP","INTEROP", .tProjectObj))
-		
+
+		set ^zStatus = "Completed Run"
+
 		//Once we have a Project Object, convert it to JSON
 
 		set tStatus = tProjectObj.%JSONExportToStream(.tResponse)
@@ -29,7 +33,7 @@ ClassMethod RunUnitTest(className As %String = "*") As %Status
 		Set %response.ContentType="application/json"
 	
 		Set %response.Status = 200
-		Do tResponse.OutputToDevice()
+		//Do tResponse.OutputToDevice()
 		Set ^zLog="Method called:OutputToDevice"
 		Do %response.SetHeader("Access-Control-Allow-Origin","*")
 
@@ -38,6 +42,7 @@ ClassMethod RunUnitTest(className As %String = "*") As %Status
 	Catch Ex {
 		Set tStatus = Ex.AsStatus()
 		Set %response.Status = 500
+		Set %response = tStatus
 		Set tStatus = $$$OK
 	}
 	Quit tStatus

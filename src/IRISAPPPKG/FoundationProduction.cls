@@ -29,19 +29,19 @@ XData ProductionDefinition
   </Item>
 
 
-  <Item Name="CGHOruRouter" Category="CGH ORU" ClassName="EnsLib.HL7.MsgRouter.RoutingEngine" PoolSize="1" Enabled="false" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+  <Item Name="CGHOruRouter" Category="CGH ORU" ClassName="EnsLib.HL7.MsgRouter.RoutingEngine" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
     <Setting Target="Host" Name="BusinessRuleName">INTEROP.InteroperabilityProject.CGH.CGHOruRoutingRule.CGHOruRouter</Setting>
   </Item>
-  <Item Name="GHAdtRouter" Category="GH ADT" ClassName="EnsLib.HL7.MsgRouter.RoutingEngine" PoolSize="1" Enabled="false" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+  <Item Name="GHAdtRouter" Category="GH ADT" ClassName="EnsLib.HL7.MsgRouter.RoutingEngine" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
     <Setting Target="Host" Name="BusinessRuleName">INTEROP.InteroperabilityProject.GH.GHAdtRoutingRule.GHAdtRouter</Setting>
   </Item>
     <Item Name="SGHAdtRouter" Category="SGH ADT" ClassName="EnsLib.HL7.MsgRouter.RoutingEngine" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
     <Setting Target="Host" Name="BusinessRuleName">INTEROP.InteroperabilityProject.SGH.SGHAdtRoutingRule.SGHAdtRouter</Setting>
   </Item>
-  <Item Name="SHHAdtRouter" Category="SHH ADT" ClassName="EnsLib.HL7.MsgRouter.RoutingEngine" PoolSize="1" Enabled="false" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+  <Item Name="SHHAdtRouter" Category="SHH ADT" ClassName="EnsLib.HL7.MsgRouter.RoutingEngine" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
     <Setting Target="Host" Name="BusinessRuleName">INTEROP.InteroperabilityProject.SHH.SHHAdtRoutingRule.SHHAdtRouter</Setting>
   </Item>
-  <Item Name="SWCAdtRouter" Category="SWC ADT" ClassName="EnsLib.HL7.MsgRouter.RoutingEngine" PoolSize="1" Enabled="false" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+  <Item Name="SWCAdtRouter" Category="SWC ADT" ClassName="EnsLib.HL7.MsgRouter.RoutingEngine" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
     <Setting Target="Host" Name="BusinessRuleName">INTEROP.InteroperabilityProject.SWC.SWCAdtRoutingRule.SWCAdtRouter</Setting>
   </Item>
 
