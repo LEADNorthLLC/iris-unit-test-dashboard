@@ -81,7 +81,7 @@ function App() {
       <div className="bg-white rounded-xl shadow-lg p-6">
         <div className="flex items-start space-x-4 mb-6">
           <div className="flex-grow">
-            <h1 className="text-2xl font-bold text-gray-900 pb-2">Unit Testing Dashboard</h1>
+            <h1 className="text-2xl font-bold text-gray-900 pb-2">IRIS Unit Test Dashboard</h1>
             <h2 className="pt-2">
               {data?.Name || 'Testing Project'}
             </h2>
