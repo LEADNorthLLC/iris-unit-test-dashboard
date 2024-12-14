@@ -2,6 +2,9 @@ export interface TestCase {
   name: string;
   status: 'pending' | 'Passed' | 'Failed';
   description?: string;
+  duration?: number;
+  counter?: number;
+  location?: string;
   datetime?: string;
 }
 

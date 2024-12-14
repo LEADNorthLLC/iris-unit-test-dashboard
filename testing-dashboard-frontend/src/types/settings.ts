@@ -3,4 +3,5 @@ export interface Settings {
   runTestsUrl: string;
   useSampleData: boolean;
   useSampleDataOnError: boolean;
+  refreshInterval: number;
 }

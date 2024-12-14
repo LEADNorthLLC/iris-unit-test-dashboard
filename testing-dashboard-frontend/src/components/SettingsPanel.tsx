@@ -133,6 +133,23 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
               )}
             </div>
 
+            <div>
+              <label htmlFor="refreshInterval" className="block text-sm font-medium text-gray-700 mb-2">
+                Data Refresh Interval
+              </label>
+              <select
+                id="refreshInterval"
+                value={settings.refreshInterval}
+                onChange={(e) => onSettingsChange({ ...settings, refreshInterval: parseInt(e.target.value, 10) })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value={120000}>2 minutes</option>
+                <option value={300000}>5 minutes</option>
+                <option value={600000}>10 minutes</option>
+                <option value={1800000}>30 minutes</option>
+              </select>
+            </div>
+
             <div className="flex items-center justify-between">
               <label htmlFor="useSampleData" className="text-sm font-medium text-gray-700">
                 Use sample data instead of API

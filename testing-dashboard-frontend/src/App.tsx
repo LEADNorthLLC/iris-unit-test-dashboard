@@ -22,9 +22,10 @@ function App() {
   const [runningTests, setRunningTests] = useState(false);
   const [settings, setSettings] = useState<SettingsType>({
     apiUrl: 'http://localhost:62773/csp/unittest/service/results',
-    runTestsUrl: 'http://localhost:62773/csp/unittest/service/runtest',
+    runTestsUrl: 'http://localhost:62773/csp/unittest/service/runtestasync',
     useSampleData: false,
     useSampleDataOnError: true,
+    refreshInterval: 120000,
   });
   
   const { data, loading, error, lastFetchTime, fetchData } = useDataFetching(settings);
@@ -78,29 +79,29 @@ function App() {
 
     return (
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <div className="flex items-center space-x-4 mb-6">
+        <div className="flex items-start space-x-4 mb-6">
           <div className="flex-grow">
             <h1 className="text-2xl font-bold text-gray-900 pb-2">Unit Testing Dashboard</h1>
             <h2 className="pt-2">
               {data?.Name || 'Testing Project'}
             </h2>
-            <div className="flex items-center space-x-2">
+            <div className="space-y-2">
               <p className="text-gray-500">Namespace: {data?.Namespace?.Name}</p>
               {data?.Namespace && (
-                <div className="flex items-center space-x-2">
+                // <div className="flex items-center space-x-2 mt-1">
                   <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
                     {data.Namespace.UnitTestClasses.length} Unit Tests
                   </span>
-                  <div className="flex items-center space-x-2">
-                    {lastFetchTime && (
-                      <span className="text-gray-500 text-xs">
-                        Last updated: {formatDate(lastFetchTime)}
-                      </span>
-                    )}
-                    <RefreshButton onRefresh={fetchData} />
-                  </div>
-                </div>
+                // </div>
               )}
+              <div className="flex items-center space-x-2">
+                {lastFetchTime && (
+                  <span className="text-gray-500 text-xs">
+                    Last updated: {formatDate(lastFetchTime)} • Refresh every {settings.refreshInterval / 60000} minutes
+                  </span>
+                )}
+                <RefreshButton onRefresh={fetchData} />
+              </div>
             </div>
           </div>
           <button
@@ -147,7 +148,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-full mx-auto px-8 py-8">
         <TabView
           activeTab={activeTab}
           onTabChange={setActiveTab}

@@ -1,9 +1,10 @@
 import React from 'react';
 import { useState, useMemo } from 'react';
-import { CheckCircle2, XCircle, Clock, Play, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { CheckCircle2, XCircle, Clock, Play, ArrowUpDown, ArrowUp, ArrowDown, Timer, Hash, Copy, CheckCircle2 as Check } from 'lucide-react';
 import axios from 'axios';
 import type { TestCase } from '../types/testing';
 import { TestFilters, TestFilter } from './TestFilters';
+import { getShortLocation } from '../utils/getShortLocation';
 
 type SortField = 'name' | 'datetime';
 type SortDirection = 'asc' | 'desc';
@@ -19,6 +20,17 @@ export const TestDetailsPanel: React.FC<TestDetailsPanelProps> = ({ testCases, c
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [selectedFilter, setSelectedFilter] = useState<TestFilter>('all');
   const itemsPerPage = 10;
+  const [copiedLocation, setCopiedLocation] = useState<string | null>(null);
+
+  const handleCopyLocation = async (location: string) => {
+    try {
+      await navigator.clipboard.writeText(location);
+      setCopiedLocation(location);
+      setTimeout(() => setCopiedLocation(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy location:', err);
+    }
+  };
   
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -169,7 +181,7 @@ export const TestDetailsPanel: React.FC<TestDetailsPanelProps> = ({ testCases, c
         <thead className="bg-white">
           <tr>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Status
+              
             </th>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               <button
@@ -182,6 +194,21 @@ export const TestDetailsPanel: React.FC<TestDetailsPanelProps> = ({ testCases, c
             </th>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-96">
               Description
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Location
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <div className="flex items-center space-x-1">
+                <Timer className="w-4 h-4" />
+                <span> </span>
+              </div>
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <div className="flex items-center space-x-1">
+              <Hash className="w-4 h-4" />
+                <span> </span>
+              </div>
             </th>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               <button
@@ -210,6 +237,32 @@ export const TestDetailsPanel: React.FC<TestDetailsPanelProps> = ({ testCases, c
               </td>
               <td className="px-6 py-4 whitespace-pre-line text-sm text-gray-900 max-w-md truncate">
                 {testCase.description || '-'}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                {testCase.location ? (
+                  <div className="flex items-center space-x-2">
+                    <span>{getShortLocation(testCase.location)}</span>
+                    <button
+                      onClick={() => handleCopyLocation(testCase.location!)}
+                      className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                      title="Copy full location"
+                    >
+                      {copiedLocation === testCase.location ? (
+                        <Check className="w-4 h-4 text-green-500" />
+                      ) : (
+                        <Copy className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+                      )}
+                    </button>
+                  </div>
+                ) : (
+                  '-'
+                )}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {testCase.duration ? `${Math.floor(testCase.duration)}ms` : '-'}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {testCase.counter ?? '-'}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {testCase.datetime || '-'}
