@@ -113,7 +113,7 @@ ClassMethod SwaggerSpec() As %Status
   Set tSC = ##class(%REST.API).GetWebRESTApplication($NAMESPACE, %request.Application, .swagger)
   Do swagger.info.%Remove("x-ISC_Namespace")
   Set swagger.basePath = "/csp/unittest/service"
-  Set swagger.info.title = "InterSystems IRIS CCD Visualizer API"
+  Set swagger.info.title = "InterSystems IRIS Unit Test API"
   Set swagger.info.version = "0.1"
   Set swagger.host = "localhost:62773"
   Return ..%ProcessResult($$$OK, swagger)

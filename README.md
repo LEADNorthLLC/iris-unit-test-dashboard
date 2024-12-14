@@ -1,18 +1,23 @@
 ## iris-unit-test-dashboard
 
-A UI and API for testing CCDA documents against the IRIS XPath Utilities and C-CDA to SDA XSLT code base. 
+A Dashboard and API for returning Unit Test class and Test Results for an IRIS Interoperability Project 
 
 ## Contributors
 
-Chi Nguyen-Rettig (LEAD North)
-
-Shawntelle Madison-Coker (LEAD North)
+* [Chi Nguyen-Rettig (LEAD North)-Backend & API](https://community.intersystems.com/user/chi-nguyen-rettig)
+* [Shawntelle Madison-Coker (LEAD North)-User Interface](https://community.intersystems.com/user/shawntelle-madison-coker) 
+* [Andre Ribera (LEAD North)-Interoperability](https://community.intersystems.com/user/andre-ribera)
 
 ## Inspiration
-To create a user-friendly front-end to organize several testing utilities and methods used to facility CCD transform development
+[Ideas Portal: Testing Dashboard for InterSystems IRIS](https://ideas.intersystems.com/ideas/DPI-I-441)
+InterSystems interoperability projects involve testing routing and transformation pipelines in a namespace production. 
+Packaging automated unit tests for integrations is possible using the %UnitTest class and the Unit Test dashboard from the 
+System Management portal provides visibility into the results, but the Unit Test manager and Test Suite framework presents challenges to implementers due to lack of interoperability samples. 
+
+The goal of the iris-unit-test-dashboard is to create a user-friendly and top-view dashboard for implementers to track the status of unit test development for a collection of feeds in an implementation project. 
 
 ## What it does
-Creates /csp/visualizer/service web app in IRIS with endpoints for XPath testing, XSLT testing, and CCD to SDA transform testing. 
+This repository contains an IRIS for Health instance with a namespace (IRISAPP) that contains an example directory structure to organize Unit Tests by Project Name, Namespace, and Unit Tests that contain methods for verifying simple HL7 integrations. The provided APIs provide visibility into the Unit Test classes and Test Cases for each class as well as the results of running the Unit Tests. An API to run the Unit Tests with a single command allows for push button execution of unit tests without needing to drill down to IRIS Terminal to perform command line operations. 
 
 <!--
 It uses [swagger-ui](https://openexchange.intersystems.com/package/iris-web-swagger-ui) module to provide documentation and test environment for API.
@@ -29,7 +34,7 @@ Make sure you have [git](https://git-scm.com/book/en/v2/Getting-Started-Installi
 Clone/git pull the repo into any local directory e.g. like it is shown below:
 
 ```bash
-$ git clone git@github.com:LEADNorthLLC/iris-ccd-devtools.git/
+$ git clone git@github.com:LEADNorthLLC/iris-unit-test-dashboard.git/
 ```
 
 Open the terminal in this directory and run:
@@ -52,6 +57,7 @@ Login: _system/SYS
 To fetch the demonstration tests: localhost:62773/csp/unittest/service
 To fetch the demonstration test results: localhost:62773/csp/unittest/service/results
 To run all the tests Production: localhost:62773/csp/unittest/service/runtest
+To run all the tests Production(asynchronous/nowait mode): localhost:62773/csp/unittest/service/runtestasync
 
 ## How to Access the IRIS Terminal from Docker Terminal
 
@@ -65,19 +71,26 @@ Then open IRIS terminal:
 iris session IRIS
 ```
 
-## Testing Dashboard UI:
+## IRIS Unit Test Dashboard User Interface:
 
 The UI is served from a second container and is available after docker startup at: 
 
-[Testing Dashboard URL](http://localhost:4000)
+[IRIS Unit Test Dashboard URL](http://localhost:4000)
 
 
+## Sample Interoperability Project
+A sample HL7 integration has been provided in: `src\INTEROP\InteroperabilityProject`.
+
+The code includes simple routing rules and DTL transformations along with Unit Test classes located in the `UnitTest` folder. 
+
+The Unit Test classes are modifications based on an open source HL7 RuleSet testing library provided by Alex Woodward. 
 
 ## REST APIs - TESTING
 
-**Sample Data**
-Sample C-CDAs from the [SyntheaMass](https://synthea.mitre.org/downloads) open-source data set have been included in the `testing/sample data` folder for unit testing. 
+**Postman Collection**
+There is a Postman Collection located in the `testing` folder:
 
+`testing\IRIS UnitTest Dashboard.postman_collection.json` 
 
 ## Built with
 Using VSCode and ObjectScript plugin, IRIS for Health Community Edition in Docker, IRIS openapi API, React.

@@ -34,15 +34,14 @@ ClassMethod RunUnitTest(className As %String = "*") As %Status
 	
 		Set %response.Status = 200
 		//Do tResponse.OutputToDevice()
-		Set ^zLog="Method called:OutputToDevice"
 		Do %response.SetHeader("Access-Control-Allow-Origin","*")
 
 
 	} 
 	Catch Ex {
 		Set tStatus = Ex.AsStatus()
-		Set %response.Status = 500
 		Set %response = tStatus
+		Set %response.Status = 500
 		Set tStatus = $$$OK
 	}
 	Quit tStatus
@@ -109,15 +108,12 @@ ClassMethod GetTestResults() As %Status
 	
 		Set %response.Status = 200
 		Do tResponse.OutputToDevice()
-		Set ^zLog="Method called:OutputToDevice"
 		Do %response.SetHeader("Access-Control-Allow-Origin","*")
-
-
 	} 
 	Catch Ex {
 		Set tStatus = Ex.AsStatus()
-		//If $$$TESTMODE zw tSC
 		Set %response.Status = 500
+		Set %response = tStatus
 		Set tStatus = $$$OK
 	}
 	Quit tStatus

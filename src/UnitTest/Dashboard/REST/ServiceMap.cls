@@ -23,11 +23,10 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 	<Route Url="/results" Method="GET" Call="GetTestResults"/>
 	<Route Url="/runtest" Method="GET" Call="RunUnitTest"/>
 	<Route Url="/runtestasync" Method="GET" Call="RunUnitTestAsync"/>
-    <Route Url="/GetTask/:TaskId" Method="GET" Call="GetTask"/>
   </Routes>
 }
 
-// Asynch call to Run Tests
+// Asynch call to Run Tests. Otherwise the blocking calls will cause timeouts to API
 
 ClassMethod RunUnitTestAsync()
 {

@@ -1,0 +1,80 @@
+{
+	"info": {
+		"_postman_id": "7c15e0d2-b6be-42b1-b8f3-b1d31b9c2273",
+		"name": "IRIS UnitTest Dashboard",
+		"description": "This collection contains sample GET requests for the IRIS Unit Test Dashboard API.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28965276"
+	},
+	"item": [
+		{
+			"name": "GetResults",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:62773/csp/unittest/service/results",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "62773",
+					"path": [
+						"csp",
+						"unittest",
+						"service",
+						"results"
+					]
+				},
+				"description": "Call to get the unit tests defined in project with test results if any tests have been run."
+			},
+			"response": []
+		},
+		{
+			"name": "RunTests",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:62773/csp/unittest/service/runtest",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "62773",
+					"path": [
+						"csp",
+						"unittest",
+						"service",
+						"runtest"
+					]
+				},
+				"description": "Synchronous call to run all unit tests in project. Will time out if there are many tests."
+			},
+			"response": []
+		},
+		{
+			"name": "RunTestsAsync",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:62773/csp/unittest/service/runtestasync",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "62773",
+					"path": [
+						"csp",
+						"unittest",
+						"service",
+						"runtestasync"
+					]
+				},
+				"description": "Asynchronous call to RunTests. The call will return while the run test task continues in the background on the backend."
+			},
+			"response": []
+		}
+	]
+}

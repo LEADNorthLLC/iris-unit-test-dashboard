@@ -26,8 +26,5 @@ do ##class(%EnsembleMgr).EnableNamespace("IRISAPP")
 zn "IRISAPP"
 set ^UnitTest("TestDirectory")="/opt/irisapp"    
 zpm "load /home/irisowner/dev/ -v":1:1
-   
-Do ##class(Ens.Director).SetAutoStart("IRISAPPPKG.FoundationProduction")
-Do ##class(Ens.Director).StartProduction("IRISAPPPKG.FoundationProduction")
     
 halt
