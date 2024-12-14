@@ -53,6 +53,98 @@ function App() {
     cls.testCaseList && cls.testCaseList.length > 0
   ) ?? false;
 
+  const renderMainContent = () => {
+    if (!settings.apiUrl.trim() && !settings.useSampleData) {
+      return (
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <div className="flex items-center justify-center">
+            <div className="text-center">
+              <AlertCircle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">No Data Source Configured</h2>
+              <p className="text-gray-600 mb-4">
+                Please configure an API URL in settings to view test results.
+              </p>
+              <button
+                onClick={() => setIsSettingsOpen(true)}
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Open Settings
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="bg-white rounded-xl shadow-lg p-6">
+        <div className="flex items-center space-x-4 mb-6">
+          <div className="flex-grow">
+            <h1 className="text-2xl font-bold text-gray-900 pb-2">Unit Testing Dashboard</h1>
+            <h2 className="pt-2">
+              {data?.Name || 'Testing Project'}
+            </h2>
+            <div className="flex items-center space-x-2">
+              <p className="text-gray-500">Namespace: {data?.Namespace?.Name}</p>
+              {data?.Namespace && (
+                <div className="flex items-center space-x-2">
+                  <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                    {data.Namespace.UnitTestClasses.length} Unit Tests
+                  </span>
+                  <div className="flex items-center space-x-2">
+                    {lastFetchTime && (
+                      <span className="text-gray-500 text-xs">
+                        Last updated: {formatDate(lastFetchTime)}
+                      </span>
+                    )}
+                    <RefreshButton onRefresh={fetchData} />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+          <button
+            onClick={handleRunAllTests}
+            disabled={settings.useSampleData || !hasTests || runningTests}
+            className={`inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
+              settings.useSampleData || !hasTests || runningTests
+                ? 'bg-blue-300 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+            }`}
+          >
+            {runningTests ? 'Running Tests...' : 'Run All Tests in Project'}
+          </button>
+        </div>
+
+        {runningTests && (
+          <div className="mb-6 bg-blue-50 border-l-4 border-blue-400 p-4">
+            <div className="flex items-center">
+              <AlertCircle className="w-5 h-5 text-blue-400 mr-3" />
+              <p className="text-blue-700">
+                Tests are now running. Results will appear as they become available during the next few refreshes.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {loading && <LoadingSpinner countdown={countdown} />}
+        {error && <ErrorBanner message={error} />}
+        {settings.useSampleData && <SampleDataBanner />}
+
+        {!loading && data?.Namespace?.UnitTestClasses && (
+          <>
+            <TestStatistics 
+              testCases={data.Namespace.UnitTestClasses.flatMap(
+                cls => cls.testCaseList || []
+              )} 
+            />
+            <TestList unitTestClasses={data.Namespace.UnitTestClasses} />
+          </>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -71,76 +163,7 @@ function App() {
               </div>
               <CreateTestForm />
             </div>
-          ) : (
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <div className="flex items-center space-x-4 mb-6">
-                <div className="flex-grow">
-                  <h1 className="text-2xl font-bold text-gray-900 pb-2">Unit Testing Dashboard</h1>
-                
-                  <h2 className="pt-2">
-                    {data?.Name || 'Testing Project'}
-                  </h2>
-                  <div className="flex items-center space-x-2">
-                    <p className="text-gray-500">Namespace: {data?.Namespace?.Name}</p>
-                    {data?.Namespace && (
-                      <div className="flex items-center space-x-2">
-                        <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                          {data.Namespace.UnitTestClasses.length} Unit Tests
-                        </span>
-                        <div className="flex items-center space-x-2">
-                          {lastFetchTime && (
-                            <span className="text-gray-500 text-xs">
-                              Last updated: {formatDate(lastFetchTime)}
-                            </span>
-                          )}
-                          <RefreshButton onRefresh={fetchData} />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <button
-                  onClick={handleRunAllTests}
-                  disabled={settings.useSampleData || !hasTests || runningTests}
-                  className={`inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
-                    settings.useSampleData || !hasTests || runningTests
-                      ? 'bg-blue-300 cursor-not-allowed'
-                      : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
-                  }`}
-                >
-                  {runningTests ? 'Running Tests...' : 'Run All Tests in Project'}
-                </button>
-              </div>
-
-              {runningTests && (
-                <div className="mb-6 bg-blue-50 border-l-4 border-blue-400 p-4">
-                  <div className="flex items-center">
-                    <AlertCircle className="w-5 h-5 text-blue-400 mr-3" />
-                    <p className="text-blue-700">
-                      Tests are now running. Results will appear as they become available during the next few refreshes.
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {loading && <LoadingSpinner countdown={countdown} />}
-
-              {error && <ErrorBanner message={error} />}
-              
-              {settings.useSampleData && <SampleDataBanner />}
-
-              {!loading && data?.Namespace?.UnitTestClasses && (
-                <>
-                  <TestStatistics 
-                    testCases={data.Namespace.UnitTestClasses.flatMap(
-                      cls => cls.testCaseList || []
-                    )} 
-                  />
-                  <TestList unitTestClasses={data.Namespace.UnitTestClasses} />
-                </>
-              )}
-            </div>
-          )}
+          ) : renderMainContent()}
         </div>
       </div>
       <SettingsPanel

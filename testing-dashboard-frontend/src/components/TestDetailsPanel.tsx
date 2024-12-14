@@ -1,8 +1,9 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { CheckCircle2, XCircle, Clock, Play, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import axios from 'axios';
 import type { TestCase } from '../types/testing';
+import { TestFilters, TestFilter } from './TestFilters';
 
 type SortField = 'name' | 'datetime';
 type SortDirection = 'asc' | 'desc';
@@ -16,6 +17,7 @@ export const TestDetailsPanel: React.FC<TestDetailsPanelProps> = ({ testCases, c
   const [currentPage, setCurrentPage] = useState(1);
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [selectedFilter, setSelectedFilter] = useState<TestFilter>('all');
   const itemsPerPage = 10;
   
   const handleSort = (field: SortField) => {
@@ -47,8 +49,26 @@ export const TestDetailsPanel: React.FC<TestDetailsPanelProps> = ({ testCases, c
     }
   };
 
-  // Sort test cases
-  const sortedTestCases = [...testCases].sort((a, b) => {
+  const filteredAndSortedTestCases = useMemo(() => {
+    // First apply filters
+    let filtered = [...testCases];
+    
+    switch (selectedFilter) {
+      case 'passed':
+        filtered = filtered.filter(test => test.status === 'Passed');
+        break;
+      case 'failed':
+        filtered = filtered.filter(test => test.status === 'Failed');
+        break;
+      case 'withDescription':
+        filtered = filtered.filter(test => test.description && test.description.trim() !== '');
+        break;
+      default:
+        break;
+    }
+
+    // Then sort
+    return filtered.sort((a, b) => {
     if (sortField === 'name') {
       return sortDirection === 'asc' 
         ? a.name.localeCompare(b.name)
@@ -58,13 +78,14 @@ export const TestDetailsPanel: React.FC<TestDetailsPanelProps> = ({ testCases, c
       const dateB = b.datetime ? new Date(b.datetime).getTime() : 0;
       return sortDirection === 'asc' ? dateA - dateB : dateB - dateA;
     }
-  });
+    });
+  }, [testCases, selectedFilter, sortField, sortDirection]);
 
   // Get current page's test cases
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = sortedTestCases.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(sortedTestCases.length / itemsPerPage);
+  const currentItems = filteredAndSortedTestCases.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredAndSortedTestCases.length / itemsPerPage);
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -89,7 +110,7 @@ export const TestDetailsPanel: React.FC<TestDetailsPanelProps> = ({ testCases, c
     <div className="flex items-center justify-between px-6 py-3 bg-gray-50">
       <div className="flex items-center text-sm text-gray-700">
         <span>
-          Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, testCases.length)} of {testCases.length} results
+          Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredAndSortedTestCases.length)} of {filteredAndSortedTestCases.length} results
         </span>
       </div>
       <div className="flex items-center space-x-2">
@@ -140,6 +161,10 @@ export const TestDetailsPanel: React.FC<TestDetailsPanelProps> = ({ testCases, c
     </div>
   ) : (
     <div className="overflow-x-auto">
+      <TestFilters
+        selectedFilter={selectedFilter}
+        onFilterChange={setSelectedFilter}
+      />
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-white">
           <tr>

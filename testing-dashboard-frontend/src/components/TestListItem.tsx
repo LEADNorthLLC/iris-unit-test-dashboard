@@ -72,7 +72,7 @@ export const TestListItem: React.FC<TestListItemProps> = ({ unitTestClass }) => 
       {showDetails && (
         <tr>
           <td colSpan={4} className="px-6 py-4 bg-gray-50">
-            <p className="px-6 py-4" >Hello Panel</p>
+           
             <TestDetailsPanel 
               testCases={unitTestClass.testCaseList || []}
               className={unitTestClass.name}
