@@ -10,6 +10,15 @@ Property status As %String [ InitialExpression = "pending" ];
 
 Property datetime As %String;
 
+Property duration As %String;
+
+Property location As %String;
+
+Property action As %String; 
+
+Property counter As %String; 
+
+
 Storage Default
 {
 <Data name="TestCaseResultState">

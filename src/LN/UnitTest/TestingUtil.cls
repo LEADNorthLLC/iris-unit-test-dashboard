@@ -69,12 +69,11 @@ ClassMethod BuildTestStatus(projectName As %String, namespace As %String = "", p
 			Set classname = unitTestObj.name
 			Set testcasename = testCaseObj.name
 			&sql(DECLARE C1 CURSOR FOR
- 			SELECT t.Description, t.Status, i.DateTime
- 			INTO :description, :status, :datetime
+ 			SELECT t.Action, t.Description, t.Status, i.Duration, t.Location, t.Counter, i.DateTime
+ 			INTO :action,:description, :status, :duration, :location, :counter, :datetime
 			FROM %UnitTest_Result.TestAssert t, %UnitTest_Result.TestInstance i  
 			WHERE t.TestMethod [  :classname AND t.TestMethod [ :testcasename AND
-			i.ID = $EXTRACT(t.TestMethod, 0, 1) and  
-	    		t.Action [ 'Assert' 
+			i.ID = $EXTRACT(t.TestMethod, 0, 1) 
 			ORDER BY i.datetime
 
     		)
@@ -89,6 +88,11 @@ ClassMethod BuildTestStatus(projectName As %String, namespace As %String = "", p
 			 	set testCaseResultObj.name = testcasename
 			 	set testCaseResultObj.description = description
 			 	set testCaseResultObj.datetime = datetime
+				set testCaseResultObj.duration = duration
+				set testCaseResultObj.action = action
+				set testCaseResultObj.location = location
+				set testCaseResultObj.counter = counter
+
 			 	Set testCaseResultObj.status = $SELECT(status=1:"Passed", status=0:"Failed", 1:"Unknown")
 			 	//set testCaseResultObj.status = status
 			 	do unitTestObj.testCaseList.Insert(testCaseResultObj)

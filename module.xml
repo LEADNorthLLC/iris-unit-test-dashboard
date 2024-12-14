@@ -24,6 +24,12 @@
       UseCookies="2"
       CookiePath="/csp/unittest/service"
     />
+      <Invoke Class="Ens.Director" Method="SetAutoStart">
+        <Arg>IRISAPPPKG.FoundationProduction</Arg>
+      </Invoke>
+      <Invoke Class="Ens.Director" Method="StartProduction">
+        <Arg>IRISAPPPKG.FoundationProduction</Arg>
+      </Invoke>
     </Module>
     
   </Document>

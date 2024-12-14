@@ -16,6 +16,7 @@ XData setup
      <CSPApplication Url="/csp/${app}" Directory="${cspdir}${app}"  ServeFiles="1" Recurse="1" MatchRoles=":%DB_${Namespace}" AuthenticationMethods="32" 
     />
   </Namespace>
+  <RunInstall Class="App.Installer" Method="SetAutoStart"/>
 </Manifest>
 }
 
@@ -23,6 +24,20 @@ ClassMethod setup(ByRef pVars, pLogLevel As %Integer = 3, pInstaller As %Install
 {
   #; Let XGL document generate code for this method. 
   Quit ##class(%Installer.Manifest).%Generate(%compiledclass, %code, "setup")
+}
+
+ClassMethod SetAutoStart(ByRef pVars, pLogLevel, tInstaller) As %Status
+{
+  Set Namespace = tInstaller.Evaluate("${Namespace}")
+  Do tInstaller.PushNS(Namespace)
+  Set tSC = $$$OK
+  Try {
+    Set ^Ens.AutoStart = "IRISAPPPKG.FoundationProduction"
+    Set ^Ens.AutoStart("StartupPriority") = 0
+  } Catch { }
+  Do tInstaller.PopNS()
+  If $$$ISERR(tSC) Throw ##class(%Installer.Exception).CreateFromStatus(tSC)
+  Quit $$$OK
 }
 
 }
