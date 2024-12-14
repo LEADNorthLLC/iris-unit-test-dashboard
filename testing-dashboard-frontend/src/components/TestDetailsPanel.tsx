@@ -1,10 +1,11 @@
 import React from 'react';
 import { useState, useMemo } from 'react';
-import { CheckCircle2, XCircle, Clock, Play, ArrowUpDown, ArrowUp, ArrowDown, Timer, Hash, Copy, CheckCircle2 as Check } from 'lucide-react';
+import { CheckCircle2, XCircle, Clock, Play, ArrowUpDown, ArrowUp, ArrowDown, Timer, Hash, Copy, CheckCircle2 as Check, Eye } from 'lucide-react';
 import axios from 'axios';
 import type { TestCase } from '../types/testing';
 import { TestFilters, TestFilter } from './TestFilters';
 import { getShortLocation } from '../utils/getShortLocation';
+import { TestDetailsPopup } from './TestDetailsPopup';
 
 type SortField = 'name' | 'datetime';
 type SortDirection = 'asc' | 'desc';
@@ -21,6 +22,7 @@ export const TestDetailsPanel: React.FC<TestDetailsPanelProps> = ({ testCases, c
   const [selectedFilter, setSelectedFilter] = useState<TestFilter>('all');
   const itemsPerPage = 10;
   const [copiedLocation, setCopiedLocation] = useState<string | null>(null);
+  const [selectedTestCase, setSelectedTestCase] = useState<TestCase | null>(null);
 
   const handleCopyLocation = async (location: string) => {
     try {
@@ -195,9 +197,9 @@ export const TestDetailsPanel: React.FC<TestDetailsPanelProps> = ({ testCases, c
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-96">
               Description
             </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            {/* <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Location
-            </th>
+            </th> */}
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               <div className="flex items-center space-x-1">
                 <Timer className="w-4 h-4" />
@@ -209,6 +211,12 @@ export const TestDetailsPanel: React.FC<TestDetailsPanelProps> = ({ testCases, c
               <Hash className="w-4 h-4" />
                 <span> </span>
               </div>
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Action
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Details
             </th>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               <button
@@ -235,10 +243,10 @@ export const TestDetailsPanel: React.FC<TestDetailsPanelProps> = ({ testCases, c
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 {testCase.name}
               </td>
-              <td className="px-6 py-4 whitespace-pre-line text-sm text-gray-900 max-w-md truncate">
+              <td className="px-6 py-4 whitespace-pre-line text-sm text-gray-900 max-w-xs truncate">
                 {testCase.description || '-'}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 {testCase.location ? (
                   <div className="flex items-center space-x-2">
                     <span>{getShortLocation(testCase.location)}</span>
@@ -257,12 +265,24 @@ export const TestDetailsPanel: React.FC<TestDetailsPanelProps> = ({ testCases, c
                 ) : (
                   '-'
                 )}
-              </td>
+              </td> */}
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {testCase.duration ? `${Math.floor(testCase.duration)}ms` : '-'}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {testCase.counter ?? '-'}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {testCase.action || '-'}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <button
+                  onClick={() => setSelectedTestCase(testCase)}
+                  className="inline-flex items-center px-2 py-1 border border-gray-300 shadow-sm text-xs rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  <Eye className="h-4 w-4 mr-1" />
+                  View All Data
+                </button>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {testCase.datetime || '-'}
@@ -281,6 +301,12 @@ export const TestDetailsPanel: React.FC<TestDetailsPanelProps> = ({ testCases, c
         </tbody>
       </table>
       {renderPaginationControls()}
+      {selectedTestCase && (
+        <TestDetailsPopup
+          testCase={selectedTestCase}
+          onClose={() => setSelectedTestCase(null)}
+        />
+      )}
     </div>
   );
 };

@@ -4,6 +4,7 @@ export interface TestCase {
   description?: string;
   duration?: number;
   counter?: number;
+  action?: string;
   location?: string;
   datetime?: string;
 }
