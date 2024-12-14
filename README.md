@@ -54,10 +54,10 @@ Login: _system/SYS
 
 ## API URLs
 
-To fetch the demonstration tests: localhost:62773/csp/unittest/service
-To fetch the demonstration test results: localhost:62773/csp/unittest/service/results
-To run all the tests Production: localhost:62773/csp/unittest/service/runtest
-To run all the tests Production(asynchronous/nowait mode): localhost:62773/csp/unittest/service/runtestasync
+To fetch the demonstration tests: [Demonstration Tests URL](http://localhost:62773/csp/unittest/service)
+To fetch the demonstration test results: [Demonstration Test Results URL](http://localhost:62773/csp/unittest/service/results)
+To run all the tests Production: [Run All Tests URL](http://localhost:62773/csp/unittest/service/runtest)
+To run all the tests Production(asynchronous/nowait mode): [Run All Tests Async URL](http://localhost:62773/csp/unittest/service/runtestasync)
 
 ## How to Access the IRIS Terminal from Docker Terminal
 
@@ -78,6 +78,8 @@ The UI is served from a second container and is available after docker startup a
 [IRIS Unit Test Dashboard URL](http://localhost:4000)
 
 ![IRIS Unit Test Dashboard](image.png)
+
+[IRIS Unit Test Dashboard Documentation](test-ui.md)
 
 ## Sample Interoperability Project
 A sample HL7 integration has been provided in: `src\INTEROP\InteroperabilityProject`.
