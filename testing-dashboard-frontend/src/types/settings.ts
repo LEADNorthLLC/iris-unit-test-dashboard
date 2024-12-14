@@ -4,4 +4,5 @@ export interface Settings {
   useSampleData: boolean;
   useSampleDataOnError: boolean;
   refreshInterval: number;
+  disableRefresh: boolean;
 }

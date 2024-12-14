@@ -140,14 +140,37 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
               <select
                 id="refreshInterval"
                 value={settings.refreshInterval}
+                disabled={settings.disableRefresh}
                 onChange={(e) => onSettingsChange({ ...settings, refreshInterval: parseInt(e.target.value, 10) })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                  settings.disableRefresh
+                    ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
+                    : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                }`}
               >
                 <option value={120000}>2 minutes</option>
                 <option value={300000}>5 minutes</option>
                 <option value={600000}>10 minutes</option>
                 <option value={1800000}>30 minutes</option>
               </select>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <label htmlFor="disableRefresh" className="text-sm font-medium text-gray-700">
+                Disable auto-refresh
+              </label>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  id="disableRefresh"
+                  className="sr-only peer"
+                  checked={settings.disableRefresh}
+                  onChange={(e) =>
+                    onSettingsChange({ ...settings, disableRefresh: e.target.checked })
+                  }
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
             </div>
 
             <div className="flex items-center justify-between">

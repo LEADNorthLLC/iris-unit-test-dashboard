@@ -37,14 +37,24 @@ export function useDataFetching(settings: Settings) {
   }, [settings.apiUrl, settings.useSampleData, settings.useSampleDataOnError]);
 
   useEffect(() => {
+    // Initial fetch
     fetchData();
     
-    const intervalId = setInterval(() => {
-      fetchData();
-    }, 120000); // 2 minutes in milliseconds
+    let intervalId: NodeJS.Timeout | null = null;
+    
+    if (!settings.disableRefresh) {
+      // Set up interval with the configured refresh time
+      intervalId = setInterval(() => {
+        fetchData();
+      }, settings.refreshInterval);
+    }
 
-    return () => clearInterval(intervalId);
-  }, [fetchData]);
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [fetchData, settings.refreshInterval, settings.disableRefresh]);
 
   return { data, loading, error, lastFetchTime, fetchData };
 }

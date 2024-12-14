@@ -26,6 +26,7 @@ function App() {
     useSampleData: false,
     useSampleDataOnError: true,
     refreshInterval: 120000,
+    disableRefresh: false,
   });
   
   const { data, loading, error, lastFetchTime, fetchData } = useDataFetching(settings);
@@ -97,7 +98,7 @@ function App() {
               <div className="flex items-center space-x-2">
                 {lastFetchTime && (
                   <span className="text-gray-500 text-xs">
-                    Last updated: {formatDate(lastFetchTime)} • Refresh every {settings.refreshInterval / 60000} minutes
+                    Last updated: {formatDate(lastFetchTime)} • {settings.disableRefresh ? 'Auto-refresh disabled' : `Refresh every ${settings.refreshInterval / 60000} minutes`}
                   </span>
                 )}
                 <RefreshButton onRefresh={fetchData} />

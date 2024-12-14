@@ -1,6 +1,6 @@
 # IRIS Unit Testing Dashboard Documentation
 
-A modern web application for managing and monitoring unit tests in IRIS.
+A web application for managing and monitoring unit tests in IRIS.
 
 ## First-Time Use
 
