@@ -1,4 +1,4 @@
-Class CCD.Visualizer.Data.HL7Message01 Extends %RegisteredObject
+Class UnitTest.Dashboard.Data.HL7Message01 Extends %RegisteredObject
 {
 
 XData HL7Message
