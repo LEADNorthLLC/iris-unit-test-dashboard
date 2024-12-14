@@ -18,8 +18,6 @@ COPY App.Installer.cls .
 
 #COPY misc/csp /usr/irissys/csp
 
-
-
 COPY .iris_init /home/irisowner/.iris_init
 
 RUN --mount=type=bind,src=.,dst=. \
@@ -44,8 +42,9 @@ RUN \
   write "Web application "_webName_" has been created!" \
 
   zn "IRISAPP" \
-  Do ##class(Ens.Director).SetAutoStart("IRISAPPPKG.FoundationProduction")\
-  Do ##class(Ens.Director).StartProduction("IRISAPPPKG.FoundationProduction")
+  #CNR: Trying to start production here does nothing!
+  #Do ##class(Ens.Director).SetAutoStart("IRISAPPPKG.FoundationProduction")\
+  #Do ##class(Ens.Director).StartProduction("IRISAPPPKG.FoundationProduction")
   #zpm "install swagger-ui" \
   #zpm "install webterminal"
   

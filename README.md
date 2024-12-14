@@ -77,6 +77,7 @@ The UI is served from a second container and is available after docker startup a
 
 [IRIS Unit Test Dashboard URL](http://localhost:4000)
 
+![IRIS Unit Test Dashboard](image.png)
 
 ## Sample Interoperability Project
 A sample HL7 integration has been provided in: `src\INTEROP\InteroperabilityProject`.
