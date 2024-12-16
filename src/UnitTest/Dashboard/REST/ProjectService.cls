@@ -6,20 +6,30 @@ Class UnitTest.Dashboard.REST.ProjectService Extends UnitTest.Dashboard.REST.Ser
 2024-12-12 - Chi Nguyen-Rettig : Updated with Test Results 
 2024-12-12 - Chi Nguyen-Rettig : Add RunUnitTest 
 **/
-ClassMethod RunUnitTest(className As %String = "*") As %Status
+ClassMethod RunUnitTest(projectName As %String = "", namespace As %String = "", packagePath As %String = "", className As %String = "*") As %Status
 {
-	Set tSC = $$$OK
+	Set tStatus = $$$OK
 	#; Quit tSC
 	Try {		
+				//if empty parameters, set to default
+		if projectName="" {
+			set tProjectName = "InteroperabilityProject"
+		}
+		if namespace="" {
+			set tNamespace = "IRISAPP"
+		}
+		if packagePath="" {
+			set tPackagePath = "INTEROP"
+		}
+		if className="" {
+			set tClassName = "*"
+		}
+
 		#;Dispatch request to production
 		#Dim tResponse as %String
 
-		set ^zStatus = "RunUnitTest()"
-
 		//this method should return a response that is project Object	 	
-    	$$$ThrowOnError(##class(LN.UnitTest.TestingUtil).RunUnitTest("InteroperabilityProject", "IRISAPP","INTEROP", .tProjectObj))
-
-		set ^zStatus = "Completed Run"
+    	$$$ThrowOnError(##class(LN.UnitTest.TestingUtil).RunUnitTest(tProjectName, tNamespace,tPackagePath, .tProjectObj,tClassName))
 
 		//Once we have a Project Object, convert it to JSON
 
@@ -47,7 +57,7 @@ ClassMethod RunUnitTest(className As %String = "*") As %Status
 	Quit tStatus
 }
 
-ClassMethod GetProjectInfo() As %Status
+ClassMethod GetProjectInfo(projectName As %String = "", namespace As %String = "", packagePath As %String = "") As %Status
 {
 	Set tSC = $$$OK
 	#; Quit tSC
@@ -55,8 +65,21 @@ ClassMethod GetProjectInfo() As %Status
 		#;Dispatch request to production
 		#Dim tResponse as %String
 
+		//if empty parameters, set to default
+		if projectName="" {
+			set tProjectName = "InteroperabilityProject"
+		}
+		if namespace="" {
+			set tNamespace = "IRISAPP"
+		}
+		if packagePath="" {
+			set tPackagePath = "INTEROP"
+		}
+
+
 		//this method should return a response that is project Object	 	
-    	$$$ThrowOnError(##class(LN.UnitTest.ProjectUtil).BuildProject("InteroperabilityProject", "IRISAPP","INTEROP", .tProjectObj))
+    	//$$$ThrowOnError(##class(LN.UnitTest.ProjectUtil).BuildProject("InteroperabilityProject", "IRISAPP","INTEROP", .tProjectObj))
+		$$$ThrowOnError(##class(LN.UnitTest.ProjectUtil).BuildProject(tProjectName, tNamespace,tPackagePath, .tProjectObj))
 		//Once we have a Project Object, convert it to JSON
 
 		set tStatus = tProjectObj.%JSONExportToStream(.tResponse)
@@ -70,25 +93,36 @@ ClassMethod GetProjectInfo() As %Status
 	
 		Set %response.Status = 200
 		Do tResponse.OutputToDevice()
-		Set ^zLog="Method called:OutputToDevice"
+		
 		Do %response.SetHeader("Access-Control-Allow-Origin","*")
 
 
 	} 
 	Catch Ex {
 		Set tStatus = Ex.AsStatus()
-		//If $$$TESTMODE zw tSC
+		Set %response = tStatus
 		Set %response.Status = 500
 		Set tStatus = $$$OK
 	}
 	Quit tStatus
 }
 
-ClassMethod GetTestResults() As %Status
+ClassMethod GetTestResults(projectName As %String = "", namespace As %String = "", packagePath As %String = "") As %Status
 {
-	Set tSC = $$$OK
-	#; Quit tSC
-	Try {		
+	Set tStatus = $$$OK
+
+	
+	Try {
+		//if empty parameters, set to default
+		if projectName="" {
+			set tProjectName = "InteroperabilityProject"
+		}
+		if namespace="" {
+			set tNamespace = "IRISAPP"
+		}
+		if packagePath="" {
+			set tPackagePath = "INTEROP"
+		}		
 		#;Dispatch request to production
 		#Dim tResponse as %String
 
@@ -112,8 +146,8 @@ ClassMethod GetTestResults() As %Status
 	} 
 	Catch Ex {
 		Set tStatus = Ex.AsStatus()
-		Set %response.Status = 500
 		Set %response = tStatus
+		Set %response.Status = 500
 		Set tStatus = $$$OK
 	}
 	Quit tStatus

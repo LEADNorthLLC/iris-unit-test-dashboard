@@ -20,41 +20,45 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 {
 <Routes>
     <Route Url="/" Method="GET" Call="GetProjectInfo"/>
+    <Route Url="/:namespace/:project" Method="GET" Call="GetProjectInfo"/>
 	<Route Url="/results" Method="GET" Call="GetTestResults"/>
-	<Route Url="/runtest" Method="GET" Call="RunUnitTest"/>
-	<Route Url="/runtestasync" Method="GET" Call="RunUnitTestAsync"/>
+    <Route Url="/results/:namespace/:project" Method="GET" Call="GetTestResults"/>
+	<Route Url="/runtest/:namespace/:project" Method="GET" Call="RunUnitTest"/>
+    <Route Url="/runtest/:namespace/:project/:unittest" Method="GET" Call="RunUnitTest"/>
+	<Route Url="/runtestasync/:namespace/:project" Method="GET" Call="RunUnitTestAsync"/>
+    <Route Url="/runtestasync/:namespace/:project/:unittest" Method="GET" Call="RunUnitTestAsync"/>
   </Routes>
 }
 
 // Asynch call to Run Tests. Otherwise the blocking calls will cause timeouts to API
 
-ClassMethod RunUnitTestAsync()
+ClassMethod RunUnitTestAsync(projectName As %String = "", namespace As %String = "", packagePath As %String = "", unitTest As %String = "")
 {
-    Job ..RunUnitTest()
+    Job ..RunUnitTest(projectName,namespace, packagePath,unitTest)
     Write {"TaskId" : ($zchild)}.%ToJSON()
     Quit $$$OK
 }
 
 // Run Unit Tests
 
-ClassMethod RunUnitTest()
+ClassMethod RunUnitTest(projectName As %String = "", namespace As %String = "", packagePath As %String = "", unitTest As %String = "")
 {
 
-	Return ##class(UnitTest.Dashboard.REST.ProjectService).RunUnitTest()
+	Return ##class(UnitTest.Dashboard.REST.ProjectService).RunUnitTest(projectName,namespace, packagePath,unitTest)
 }
 
 // Return project object
 
-ClassMethod GetProjectInfo()
+ClassMethod GetProjectInfo(projectName As %String = "", namespace As %String = "", packagePath As %String = "")
 {
 
-	Return ##class(UnitTest.Dashboard.REST.ProjectService).GetProjectInfo()
+	Return ##class(UnitTest.Dashboard.REST.ProjectService).GetProjectInfo(projectName,namespace, packagePath)
 }
 
-ClassMethod GetTestResults()
+ClassMethod GetTestResults(projectName As %String = "", namespace As %String = "", packagePath As %String = "")
 {
 
-	Return ##class(UnitTest.Dashboard.REST.ProjectService).GetTestResults()
+	Return ##class(UnitTest.Dashboard.REST.ProjectService).GetTestResults(projectName,namespace, packagePath)
 }
 
 ClassMethod FormatResultsToJSON(pResults As %ListOfDataTypes, Output pJsonString As %String)
