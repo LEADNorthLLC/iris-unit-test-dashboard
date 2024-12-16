@@ -103,7 +103,6 @@ ClassMethod BuildTestStatus(projectName As %String, namespace As %String = "", p
  			&sql(CLOSE C1)
 		}
 		
-        do projectObj.Namespace.UnitTestClasses.Insert(unitTestObj)   
 	  }
 	}
 	catch(ex) {
