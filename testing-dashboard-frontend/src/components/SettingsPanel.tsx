@@ -16,6 +16,9 @@ interface ValidationState {
   message: string;
 }
 
+const DEFAULT_API_URL = 'http://localhost:62773/csp/unittest/service/results';
+const DEFAULT_RUN_TESTS_URL = 'http://localhost:62773/csp/unittest/service/runtestasync';
+
 export const SettingsPanel: React.FC<SettingsPanelProps> = ({
   isOpen,
   onClose,
@@ -26,15 +29,42 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
     isValid: true,
     message: ''
   });
+  const [runTestsUrlValidation, setRunTestsUrlValidation] = React.useState<ValidationState>({
+    isValid: true,
+    message: ''
+  });
+  const [sampleDataValidation, setSampleDataValidation] = React.useState<ValidationState>({
+    isValid: true,
+    message: ''
+  });
 
   if (!isOpen) return null;
   
   const handleSampleDataChange = (value: string) => {
+    if (!value.trim()) {
+      setSampleDataValidation({
+        isValid: false,
+        message: 'Sample data cannot be empty'
+      });
+      return;
+    }
+
     try {
       const parsed = JSON.parse(value);
+      if (!parsed || typeof parsed !== 'object') {
+        setSampleDataValidation({
+          isValid: false,
+          message: 'Invalid JSON structure'
+        });
+        return;
+      }
       Object.assign(sampleData, parsed);
+      setSampleDataValidation({ isValid: true, message: '' });
     } catch (e) {
-      // Ignore invalid JSON
+      setSampleDataValidation({
+        isValid: false,
+        message: 'Invalid JSON format'
+      });
     }
   };
 
@@ -53,6 +83,23 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
       setUrlValidation({ isValid: true, message: '' });
     }
     onSettingsChange({ ...settings, apiUrl: url });
+  };
+
+  const handleRunTestsUrlChange = (url: string) => {
+    if (url.trim() === '') {
+      setRunTestsUrlValidation({
+        isValid: false,
+        message: 'Run Tests URL is required'
+      });
+    } else if (!validateUrl(url)) {
+      setRunTestsUrlValidation({
+        isValid: false,
+        message: 'Please enter a valid URL'
+      });
+    } else {
+      setRunTestsUrlValidation({ isValid: true, message: '' });
+    }
+    onSettingsChange({ ...settings, runTestsUrl: url });
   };
 
   const resetSampleData = () => {
@@ -75,25 +122,38 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
 
           <div className="space-y-6">
             <div>
-              <label htmlFor="apiUrl" className="block text-sm font-medium text-gray-700 mb-2">
-                Test Results API URL
-              </label>
-              <input
-                type="text"
-                id="apiUrl"
-                name="apiUrl"
-                value={settings.apiUrl}
-                disabled={settings.useSampleData}
-                onChange={(e) => handleUrlChange(e.target.value)}
-                className={`w-full px-3 py-2 border rounded-md shadow-sm ${
-                  settings.useSampleData 
-                    ? 'bg-gray-100 text-gray-500 cursor-not-allowed' 
-                    : urlValidation.isValid
-                      ? 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
-                      : 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                }`}
-                placeholder="Enter API URL"
-              />
+              <div className="flex justify-between items-center mb-2">
+                <label htmlFor="apiUrl" className="block text-sm font-medium text-gray-700">
+                  Test Results API URL
+                </label>
+                <button
+                  onClick={() => handleUrlChange(DEFAULT_API_URL)}
+                  disabled={settings.useSampleData}
+                  className="inline-flex items-center px-2 py-1 text-sm text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Reset to default API URL"
+                >
+                  <RotateCcw className="w-4 h-4 mr-1" />
+                  Reset
+                </button>
+              </div>
+              <div className="relative">
+                <input
+                  type="text"
+                  id="apiUrl"
+                  name="apiUrl"
+                  value={settings.apiUrl}
+                  disabled={settings.useSampleData}
+                  onChange={(e) => handleUrlChange(e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                    settings.useSampleData 
+                      ? 'bg-gray-100 text-gray-500 cursor-not-allowed' 
+                      : urlValidation.isValid
+                        ? 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                        : 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                  }`}
+                  placeholder="Enter API URL"
+                />
+              </div>
               {!settings.useSampleData && !urlValidation.isValid && (
                 <p className="mt-1 text-sm text-red-600">
                   {urlValidation.message}
@@ -102,33 +162,41 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
             </div>
 
             <div>
-              <label htmlFor="runTestsUrl" className="block text-sm font-medium text-gray-700 mb-2">
-                Run All Tests URL
-              </label>
-              <input
-                type="text"
-                id="runTestsUrl"
-                name="runTestsUrl"
-                value={settings.runTestsUrl}
-                disabled={settings.useSampleData}
-                onChange={(e) => {
-                  const url = e.target.value;
-                  if (url.trim() === '' || validateUrl(url)) {
-                    onSettingsChange({ ...settings, runTestsUrl: url });
-                  }
-                }}
-                className={`w-full px-3 py-2 border rounded-md shadow-sm ${
-                  settings.useSampleData 
-                    ? 'bg-gray-100 text-gray-500 cursor-not-allowed' 
-                    : validateUrl(settings.runTestsUrl)
-                      ? 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
-                      : 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                }`}
-                placeholder="Enter Run All Tests URL"
-              />
-              {!settings.useSampleData && !validateUrl(settings.runTestsUrl) && settings.runTestsUrl.trim() !== '' && (
+              <div className="flex justify-between items-center mb-2">
+                <label htmlFor="runTestsUrl" className="block text-sm font-medium text-gray-700">
+                  Run All Tests URL
+                </label>
+                <button
+                  onClick={() => handleRunTestsUrlChange(DEFAULT_RUN_TESTS_URL)}
+                  disabled={settings.useSampleData}
+                  className="inline-flex items-center px-2 py-1 text-sm text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Reset to default Run Tests URL"
+                >
+                  <RotateCcw className="w-4 h-4 mr-1" />
+                  Reset
+                </button>
+              </div>
+              <div className="relative">
+                <input
+                  type="text"
+                  id="runTestsUrl"
+                  name="runTestsUrl"
+                  value={settings.runTestsUrl}
+                  disabled={settings.useSampleData}
+                  onChange={(e) => handleRunTestsUrlChange(e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                    settings.useSampleData 
+                      ? 'bg-gray-100 text-gray-500 cursor-not-allowed' 
+                      : runTestsUrlValidation.isValid
+                        ? 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                        : 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                  }`}
+                  placeholder="Enter Run All Tests URL"
+                />
+              </div>
+              {!settings.useSampleData && !runTestsUrlValidation.isValid && (
                 <p className="mt-1 text-sm text-red-600">
-                  Please enter a valid URL
+                  {runTestsUrlValidation.message}
                 </p>
               )}
             </div>
@@ -225,11 +293,20 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
               </div>
               <textarea
                 id="sampleData"
-                className="w-full h-96 px-3 py-2 border border-gray-300 rounded-md shadow-sm font-mono text-sm focus:ring-blue-500 focus:border-blue-500"
+                className={`w-full h-96 px-3 py-2 border rounded-md shadow-sm font-mono text-sm ${
+                  sampleDataValidation.isValid
+                    ? 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                    : 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                }`}
                 defaultValue={JSON.stringify(sampleData, null, 2)}
                 onChange={(e) => handleSampleDataChange(e.target.value)}
                 spellCheck="false"
               />
+              {!sampleDataValidation.isValid && (
+                <p className="mt-1 text-sm text-red-600">
+                  {sampleDataValidation.message}
+                </p>
+              )}
             </div>
           </div>
         </div>
