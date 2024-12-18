@@ -1,7 +1,7 @@
 import React from 'react';
 import { Filter } from 'lucide-react';
 
-export type TestFilter = 'all' | 'passed' | 'failed' | 'withDescription';
+export type TestFilter = 'all' | 'passed' | 'failed' | 'pending' | 'withDescription';
 
 interface TestFiltersProps {
   selectedFilter: TestFilter;
@@ -45,6 +45,16 @@ export const TestFilters: React.FC<TestFiltersProps> = ({
           }`}
         >
           Failed
+        </button>
+        <button
+          onClick={() => onFilterChange('pending')}
+          className={`px-3 py-1 rounded-full text-sm font-medium ${
+            selectedFilter === 'pending'
+              ? 'bg-yellow-100 text-yellow-800'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          }`}
+        >
+          Pending
         </button>
         <button
           onClick={() => onFilterChange('withDescription')}

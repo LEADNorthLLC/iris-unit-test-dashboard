@@ -24,6 +24,11 @@ export const TestDetailsPanel: React.FC<TestDetailsPanelProps> = ({ testCases, c
   const [copiedLocation, setCopiedLocation] = useState<string | null>(null);
   const [selectedTestCase, setSelectedTestCase] = useState<TestCase | null>(null);
 
+  const handleFilterChange = (filter: TestFilter) => {
+    setSelectedFilter(filter);
+    setCurrentPage(1); // Reset to first page when filter changes
+  };
+
   const handleCopyLocation = async (location: string) => {
     try {
       await navigator.clipboard.writeText(location);
@@ -73,6 +78,9 @@ export const TestDetailsPanel: React.FC<TestDetailsPanelProps> = ({ testCases, c
         break;
       case 'failed':
         filtered = filtered.filter(test => test.status === 'Failed');
+        break;
+      case 'pending':
+        filtered = filtered.filter(test => !test.status || test.status === 'pending');
         break;
       case 'withDescription':
         filtered = filtered.filter(test => test.description && test.description.trim() !== '');
@@ -177,7 +185,7 @@ export const TestDetailsPanel: React.FC<TestDetailsPanelProps> = ({ testCases, c
     <div className="overflow-x-auto">
       <TestFilters
         selectedFilter={selectedFilter}
-        onFilterChange={setSelectedFilter}
+        onFilterChange={handleFilterChange}
       />
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-white">
@@ -215,10 +223,8 @@ export const TestDetailsPanel: React.FC<TestDetailsPanelProps> = ({ testCases, c
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Action
             </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Details
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          
+           <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               <button
                 onClick={() => handleSort('datetime')}
                 className="inline-flex items-center space-x-1 hover:text-gray-700"
@@ -226,6 +232,9 @@ export const TestDetailsPanel: React.FC<TestDetailsPanelProps> = ({ testCases, c
                 <span>Date/Time</span>
                 {getSortIcon('datetime')}
               </button>
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Details
             </th>
             {/* <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
               Actions
@@ -275,6 +284,10 @@ export const TestDetailsPanel: React.FC<TestDetailsPanelProps> = ({ testCases, c
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {testCase.action || '-'}
               </td>
+             
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {testCase.datetime || '-'}
+              </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <button
                   onClick={() => setSelectedTestCase(testCase)}
@@ -283,9 +296,6 @@ export const TestDetailsPanel: React.FC<TestDetailsPanelProps> = ({ testCases, c
                   <Eye className="h-4 w-4 mr-1" />
                   View All Data
                 </button>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {testCase.datetime || '-'}
               </td>
               {/* <td className="px-6 py-4 whitespace-nowrap text-right">
                 <button

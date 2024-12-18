@@ -101,7 +101,11 @@ function App() {
                     Last updated: {formatDate(lastFetchTime)} • {settings.disableRefresh ? 'Auto-refresh disabled' : `Refresh every ${settings.refreshInterval / 60000} minutes`}
                   </span>
                 )}
-                <RefreshButton onRefresh={fetchData} />
+                <RefreshButton 
+                  onRefresh={fetchData}
+                  isRefreshEnabled={!settings.disableRefresh}
+                  onToggleRefresh={() => setSettings(prev => ({ ...prev, disableRefresh: !prev.disableRefresh }))}
+                />
               </div>
             </div>
           </div>

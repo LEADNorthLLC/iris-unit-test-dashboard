@@ -41,7 +41,7 @@ export const TestListItem: React.FC<TestListItemProps> = ({ unitTestClass }) => 
         <td className="px-6 py-4 whitespace-nowrap">
           <TestStatusIndicators testCases={unitTestClass.testCaseList || []} />
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+        <td className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
           {/* <button
             onClick={handleRunTests}
             disabled={!hasTests}
