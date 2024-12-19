@@ -13,7 +13,7 @@
       <Resource Name="INTEROP.PKG"/>
      
     
-      <CSPApplication 
+      <WebApplication 
       Url="/csp/unittest/service"
       DispatchClass="UnitTest.Dashboard.REST.ServiceMap"
       MatchRoles=":%All"
